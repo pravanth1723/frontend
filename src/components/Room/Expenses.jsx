@@ -16,22 +16,18 @@ export default function AddExpenseStep() {
   const [apiExpenses, setApiExpenses] = useState([]);
   
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("single"); // 'single' or 'multiple'
   const [selected, setSelected] = useState([]);
-  
-  // For single payer
-  const [singlePayer, setSinglePayer] = useState("");
-  const [singleAmount, setSingleAmount] = useState("");
   const [splitType, setSplitType] = useState("equal"); // 'equal' or 'individual'
   const [individualAmounts, setIndividualAmounts] = useState({});
   
-  // For multiple payers
+  // For payers
   const [paidEntries, setPaidEntries] = useState([]);
   const [payer, setPayer] = useState("");
   const [amount, setAmount] = useState("");
   
   const [editing, setEditing] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isExpenseListOpen, setIsExpenseListOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -111,55 +107,38 @@ export default function AddExpenseStep() {
     
     if (!description.trim()) return alert("Expense description required");
     if (selected.length === 0) return alert("Select at least one person who shares");
+    if (paidEntries.length === 0) return alert("Add at least one paid-by entry");
     
     let spentBy = [];
     let spentFor = [];
     let total = 0;
     
-    if (category === "single") {
-      // Single payer
-      if (!singlePayer) return alert("Select who paid");
-      const paidAmount = parseFloat(singleAmount);
-      if (!paidAmount || paidAmount <= 0) return alert("Enter a valid amount");
-      
-      total = paidAmount;
-      spentBy = [{ name: singlePayer, amount: paidAmount }];
-      
-      if (splitType === "equal") {
-        // Split equally
-        const perPerson = paidAmount / selected.length;
-        spentFor = selected.map(person => ({
-          name: person,
-          amount: perPerson
-        }));
-      } else {
-        // Individual amounts
-        spentFor = selected.map(person => {
-          const amt = parseFloat(individualAmounts[person] || 0);
-          if (amt <= 0) {
-            throw new Error(`Please enter valid amount for ${person}`);
-          }
-          return { name: person, amount: amt };
-        });
-        
-        const totalSpentFor = spentFor.reduce((sum, item) => sum + item.amount, 0);
-        if (Math.abs(totalSpentFor - paidAmount) > 0.01) {
-          return alert(`Total split amount (${totalSpentFor.toFixed(2)}) must equal paid amount (${paidAmount.toFixed(2)})`);
-        }
-      }
-    } else {
-      // Multiple payers
-      if (paidEntries.length === 0) return alert("Add at least one paid-by entry");
-      
-      total = paidEntries.reduce((sum, entry) => sum + entry.amount, 0);
-      spentBy = paidEntries;
-      
-      // Split equally among selected
+    // Calculate total from all payers
+    total = paidEntries.reduce((sum, entry) => sum + entry.amount, 0);
+    spentBy = paidEntries;
+    
+    // Calculate split based on type
+    if (splitType === "equal") {
+      // Split equally
       const perPerson = total / selected.length;
       spentFor = selected.map(person => ({
         name: person,
         amount: perPerson
       }));
+    } else {
+      // Individual amounts
+      spentFor = selected.map(person => {
+        const amt = parseFloat(individualAmounts[person] || 0);
+        if (amt <= 0) {
+          throw new Error(`Please enter valid amount for ${person}`);
+        }
+        return { name: person, amount: amt };
+      });
+      
+      const totalSpentFor = spentFor.reduce((sum, item) => sum + item.amount, 0);
+      if (Math.abs(totalSpentFor - total) > 0.01) {
+        return alert(`Total split amount (${totalSpentFor.toFixed(2)}) must equal paid amount (${total.toFixed(2)})`);
+      }
     }
     
     // API call
@@ -167,7 +146,6 @@ export default function AddExpenseStep() {
     axios.post('http://localhost:5000/api/expenses', {
       roomId: roomId,
       description: description.trim(),
-      category: category,
       total: total,
       spentBy: spentBy,
       spentFor: spentFor
@@ -177,10 +155,7 @@ export default function AddExpenseStep() {
           alert("Expense added successfully");
           // Reset form
           setDescription("");
-          setCategory("single");
           setSelected([]);
-          setSinglePayer("");
-          setSingleAmount("");
           setSplitType("equal");
           setIndividualAmounts({});
           setPaidEntries([]);
@@ -269,32 +244,6 @@ export default function AddExpenseStep() {
           </div>
 
           <div style={{ marginBottom: 8 }}>
-            <label className="small">Category</label>
-            <div style={{ marginTop: 8, display: "flex", gap: 12 }}>
-              <label style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                <input 
-                  type="radio" 
-                  name="category" 
-                  value="single"
-                  checked={category === "single"} 
-                  onChange={(e) => setCategory(e.target.value)} 
-                />
-                Paid by Single Person
-              </label>
-              <label style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                <input 
-                  type="radio" 
-                  name="category" 
-                  value="multiple"
-                  checked={category === "multiple"} 
-                  onChange={(e) => setCategory(e.target.value)} 
-                />
-                Paid by Multiple
-              </label>
-            </div>
-          </div>
-
-          <div style={{ marginBottom: 8 }}>
             <label className="small">Who shares this expense?</label>
             <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
               {members.length === 0 && <div className="small">Add members in Step 1 first.</div>}
@@ -307,111 +256,83 @@ export default function AddExpenseStep() {
             </div>
           </div>
 
-          {category === "single" ? (
-            <>
-              <div style={{ marginBottom: 8 }}>
-                <label className="small">Paid by</label>
-                <select 
-                  className="input" 
-                  value={singlePayer} 
-                  onChange={(e)=>setSinglePayer(e.target.value)}
-                >
-                  <option value="">Choose</option>
-                  {members.map(u => <option key={u} value={u}>{u}</option>)}
-                </select>
-              </div>
+          <div style={{ marginBottom: 8 }}>
+            <label className="small">Paid by (add one or more entries)</label>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
+              <select className="input" value={payer} onChange={(e)=>setPayer(e.target.value)}>
+                <option value="">Choose</option>
+                {members.map(u => <option key={u} value={u}>{u}</option>)}
+              </select>
+              <input 
+                className="input" 
+                type="number"
+                step="0.01"
+                placeholder="Amount" 
+                value={amount} 
+                onChange={(e)=>setAmount(e.target.value)} 
+              />
+              <button type="button" className="btn ghost" onClick={addPaidEntry}>Add</button>
+            </div>
 
-              <div style={{ marginBottom: 8 }}>
-                <label className="small">Amount Paid</label>
-                <input 
-                  className="input" 
-                  type="number"
-                  step="0.01"
-                  placeholder="Enter total amount" 
-                  value={singleAmount} 
-                  onChange={(e)=>setSingleAmount(e.target.value)} 
-                />
-              </div>
-
-              <div style={{ marginBottom: 8 }}>
-                <label className="small">Split Type</label>
-                <div style={{ marginTop: 8, display: "flex", gap: 12 }}>
-                  <label style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                    <input 
-                      type="radio" 
-                      name="splitType" 
-                      value="equal"
-                      checked={splitType === "equal"} 
-                      onChange={(e) => setSplitType(e.target.value)} 
-                    />
-                    Split Equally
-                  </label>
-                  <label style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-                    <input 
-                      type="radio" 
-                      name="splitType" 
-                      value="individual"
-                      checked={splitType === "individual"} 
-                      onChange={(e) => setSplitType(e.target.value)} 
-                    />
-                    Individual Amounts
-                  </label>
+            <div style={{ marginTop: 8 }}>
+              {paidEntries.length === 0 && <div className="small">No paid-by entries yet.</div>}
+              {paidEntries.map((p, i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: 8, background: "#fbfaff", marginTop: 6, borderRadius: 6 }}>
+                  <div>{p.name}: <b>₹{p.amount.toFixed(2)}</b></div>
+                  <div><button type="button" className="btn ghost" onClick={()=>removePaid(i)}>Remove</button></div>
                 </div>
-              </div>
-
-              {splitType === "individual" && selected.length > 0 && (
-                <div style={{ marginBottom: 8 }}>
-                  <label className="small">Enter amount for each person</label>
-                  <div style={{ marginTop: 8 }}>
-                    {selected.map(person => (
-                      <div key={person} style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 6 }}>
-                        <span style={{ minWidth: "100px", fontWeight: 500 }}>{person}:</span>
-                        <input 
-                          className="input" 
-                          type="number"
-                          step="0.01"
-                          placeholder="Amount"
-                          value={individualAmounts[person] || ""}
-                          onChange={(e) => updateIndividualAmount(person, e.target.value)}
-                        />
-                      </div>
-                    ))}
-                  </div>
+              ))}
+              {paidEntries.length > 0 && (
+                <div style={{ marginTop: 8, fontWeight: 600 }}>
+                  Total: ₹{paidEntries.reduce((sum, p) => sum + p.amount, 0).toFixed(2)}
                 </div>
               )}
-            </>
-          ) : (
-            <div style={{ marginBottom: 8 }}>
-              <label className="small">Paid by (multiple entries, will be split equally)</label>
-              <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
-                <select className="input" value={payer} onChange={(e)=>setPayer(e.target.value)}>
-                  <option value="">Choose</option>
-                  {members.map(u => <option key={u} value={u}>{u}</option>)}
-                </select>
-                <input 
-                  className="input" 
-                  type="number"
-                  step="0.01"
-                  placeholder="Amount" 
-                  value={amount} 
-                  onChange={(e)=>setAmount(e.target.value)} 
-                />
-                <button type="button" className="btn ghost" onClick={addPaidEntry}>Add</button>
-              </div>
+            </div>
+          </div>
 
+          <div style={{ marginBottom: 8 }}>
+            <label className="small">Split Type</label>
+            <div style={{ marginTop: 8, display: "flex", gap: 12 }}>
+              <label style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                <input 
+                  type="radio" 
+                  name="splitType" 
+                  value="equal"
+                  checked={splitType === "equal"} 
+                  onChange={(e) => setSplitType(e.target.value)} 
+                />
+                Split Equally
+              </label>
+              <label style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                <input 
+                  type="radio" 
+                  name="splitType" 
+                  value="individual"
+                  checked={splitType === "individual"} 
+                  onChange={(e) => setSplitType(e.target.value)} 
+                />
+                Individual Amounts
+              </label>
+            </div>
+          </div>
+
+          {splitType === "individual" && selected.length > 0 && (
+            <div style={{ marginBottom: 8 }}>
+              <label className="small">Enter amount for each person</label>
               <div style={{ marginTop: 8 }}>
-                {paidEntries.length === 0 && <div className="small">No paid-by entries yet.</div>}
-                {paidEntries.map((p, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: 8, background: "#fbfaff", marginTop: 6, borderRadius: 6 }}>
-                    <div>{p.name}: <b>₹{p.amount.toFixed(2)}</b></div>
-                    <div><button type="button" className="btn ghost" onClick={()=>removePaid(i)}>Remove</button></div>
+                {selected.map(person => (
+                  <div key={person} style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 6 }}>
+                    <span style={{ minWidth: "100px", fontWeight: 500 }}>{person}:</span>
+                    <input 
+                      className="input" 
+                      type="number"
+                      step="0.01"
+                      placeholder="Amount"
+                      value={individualAmounts[person] || ""}
+                      onChange={(e) => updateIndividualAmount(person, e.target.value)}
+                    />
                   </div>
                 ))}
-                {paidEntries.length > 0 && (
-                  <div style={{ marginTop: 8, fontWeight: 600 }}>
-                    Total: ₹{paidEntries.reduce((sum, p) => sum + p.amount, 0).toFixed(2)}
-                  </div>
-                )}
               </div>
             </div>
           )}
@@ -428,14 +349,31 @@ export default function AddExpenseStep() {
       </div>
 
       <div className="card">
-        <h3 className="small">Added Expenses</h3>
-        {apiExpenses.length === 0 ? (
-          <div className="small" style={{ color: '#999', padding: '20px', textAlign: 'center' }}>
-            No expenses added yet
-          </div>
-        ) : (
-          <div>
-            {apiExpenses.map((expense) => (
+        <div 
+          style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            cursor: 'pointer',
+            padding: '8px 0'
+          }}
+          onClick={() => setIsExpenseListOpen(!isExpenseListOpen)}
+        >
+          <h3 className="small">Added Expenses ({apiExpenses.length})</h3>
+          <span style={{ fontSize: '20px', transition: 'transform 0.3s', transform: isExpenseListOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+            ▼
+          </span>
+        </div>
+        
+        {isExpenseListOpen && (
+          <>
+            {apiExpenses.length === 0 ? (
+              <div className="small" style={{ color: '#999', padding: '20px', textAlign: 'center' }}>
+                No expenses added yet
+              </div>
+            ) : (
+              <div>
+                {apiExpenses.map((expense) => (
               <div 
                 key={expense._id} 
                 style={{ 
@@ -449,9 +387,6 @@ export default function AddExpenseStep() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 8 }}>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: '14px' }}>{expense.description}</div>
-                    <div className="small" style={{ color: '#666' }}>
-                      Category: {expense.category === 'single' ? 'Single Payer' : 'Multiple Payers'}
-                    </div>
                   </div>
                   <div style={{ fontWeight: 700, color: 'var(--primary)' }}>
                     ₹{expense.total.toFixed(2)}
@@ -494,7 +429,9 @@ export default function AddExpenseStep() {
                 </div>
               </div>
             ))}
-          </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
