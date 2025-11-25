@@ -5,8 +5,8 @@ import NavBar from "./components/NavBar";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
-import RoomPage from "./pages/RoomPage";
-import RoomsPage from "./pages/RoomsPage"; // <-- new import
+import RoomPage from "./pages/Room";
+import RoomsPage from "./pages/Rooms"; // <-- new import
 
 /**
  * App - top-level router + auth provider
