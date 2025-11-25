@@ -13,10 +13,10 @@ export default function RoomsPage() {
   const [apiRooms, setApiRooms] = useState([]);
 
   useEffect(() => {
-    fetchRoomsFromAPI();
+    fetchRooms();
   }, []);
 
-  function fetchRoomsFromAPI() {
+  function fetchRooms() {
     axios.get('http://localhost:5000/api/rooms', { withCredentials: true })
       .then(response => {
         if (response.status >= 200 && response.status < 300) {
@@ -37,7 +37,7 @@ export default function RoomsPage() {
 
       <div className="row">
         <div className="col">
-          <CreateRoom onRoomCreated={fetchRoomsFromAPI} />
+          <CreateRoom onRoomCreated={fetchRooms} />
           
           <div style={{ marginTop: 20 }}>
             <JoinRoomComponent />
