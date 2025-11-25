@@ -1,17 +1,23 @@
 import React, { useState } from "react";
 
 /**
- * EditExpenseModal - edit title, users sharing, paid-by entries
+ * EditExpenseModal - edit title, members sharing, paid-by entries
  */
-export default function EditExpenseModal({ expense, users, onClose, onApply }) {
-  const [title, setTitle] = useState(expense.title || "");
-  const [selectedUsers, setSelectedUsers] = useState([...expense.users]);
-  const [entries, setEntries] = useState((expense.spentBy || []).map(s => ({ ...s })));
+export default function EditExpenseModal({ expense, members, onClose, onApply }) {
+  console.log("Expense", expense);
+  console.log("Members", members);
+  const [title, setTitle] = useState(expense.description || "");
+  const [selectedmembers, setSelectedmembers] = useState(
+    (expense.spentFor || []).map(item => item.name)
+  );
+  const [entries, setEntries] = useState(
+    (expense.spentBy || []).map(s => ({ user: s.name, amount: s.amount }))
+  );
   const [newPayer, setNewPayer] = useState("");
   const [newAmt, setNewAmt] = useState("");
 
   function toggleUser(u) {
-    setSelectedUsers(prev => prev.includes(u) ? prev.filter(x=>x!==u) : [...prev, u]);
+    setSelectedmembers(prev => prev.includes(u) ? prev.filter(x=>x!==u) : [...prev, u]);
   }
   function addEntry() {
     const amt = parseFloat(newAmt);
@@ -26,9 +32,22 @@ export default function EditExpenseModal({ expense, users, onClose, onApply }) {
   }
   function apply() {
     if (!title.trim()) return alert("Title is required");
-    if (selectedUsers.length === 0) return alert("Select at least one person who shares");
+    if (selectedmembers.length === 0) return alert("Select at least one person who shares");
     if (entries.length === 0) return alert("Add at least one paid-by entry");
-    onApply({ title: title.trim(), users: selectedUsers, spentBy: entries });
+    
+    // Convert to API format
+    const updatedExpense = {
+      description: title.trim(),
+      category: expense.category,
+      total: entries.reduce((sum, e) => sum + parseFloat(e.amount), 0),
+      spentBy: entries.map(e => ({ name: e.user, amount: parseFloat(e.amount) })),
+      spentFor: selectedmembers.map(name => {
+        const totalAmount = entries.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+        return { name, amount: totalAmount / selectedmembers.length };
+      })
+    };
+    
+    onApply(updatedExpense);
   }
 
   return (
@@ -37,16 +56,16 @@ export default function EditExpenseModal({ expense, users, onClose, onApply }) {
         <h3>Edit Expense</h3>
 
         <div className="form-row">
-          <div className="label">Title</div>
+          <div className="label">Description</div>
           <input className="input" value={title} onChange={(e)=>setTitle(e.target.value)} />
         </div>
 
         <div style={{ marginTop: 8 }}>
           <div className="label">Who shares</div>
           <div className="checkbox-list" style={{ marginTop: 8 }}>
-            {users.map(u => (
+            {members.map(u => (
               <label key={u}>
-                <input type="checkbox" checked={selectedUsers.includes(u)} onChange={()=>toggleUser(u)} style={{ marginRight: 8 }} />
+                <input type="checkbox" checked={selectedmembers.includes(u)} onChange={()=>toggleUser(u)} style={{ marginRight: 8 }} />
                 {u}
               </label>
             ))}
@@ -68,7 +87,7 @@ export default function EditExpenseModal({ expense, users, onClose, onApply }) {
           <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
             <select className="input" value={newPayer} onChange={(e)=>setNewPayer(e.target.value)}>
               <option value="">Choose person</option>
-              {users.map(u => <option key={u} value={u}>{u}</option>)}
+              {members.map(u => <option key={u} value={u}>{u}</option>)}
             </select>
             <input className="input" placeholder="Amount" value={newAmt} onChange={(e)=>setNewAmt(e.target.value)} />
             <button className="btn ghost" onClick={addEntry} type="button">Add</button>
