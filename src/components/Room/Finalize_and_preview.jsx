@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 /**
@@ -8,6 +8,7 @@ import axios from "axios";
  */
 export default function PreviewStep() {
   const { roomId } = useParams();
+  const navigate = useNavigate();
   
   const [roomData, setRoomData] = useState(null);
   const [expenses, setExpenses] = useState([]);
@@ -44,6 +45,14 @@ export default function PreviewStep() {
       
       // Fetch expenses for this room
       const expenseRes = await axios.get(`http://localhost:5000/api/expenses/by-room-id/${roomId}`, { withCredentials: true });
+      
+      // Check if expenses array is empty
+      if (!expenseRes.data || expenseRes.data.length === 0) {
+        alert("No expenses added yet. Please add expenses first.");
+        navigate(`/room/${roomId}/step2`);
+        return;
+      }
+      
       setExpenses(expenseRes.data);
       
       setIsLoading(false);

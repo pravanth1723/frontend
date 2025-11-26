@@ -1,11 +1,10 @@
 import React from "react";
 import { useParams, Routes, Route, NavLink, Navigate, useNavigate } from "react-router-dom";
-import { SplitProvider } from "../context/SplitContext";
 import RoomCreate from "../components/Rooms/CreateRoom";
 import Setup from "../components/Room/Setup";
 import Expenses from "../components/Room/Expenses";
 import PreviewStep from "../components/Room/Finalize_and_preview"
-//import PreviewStep from "./split/PreviewStep";
+
 
 function RoomContent() {
   const { roomId } = useParams();
@@ -45,8 +44,6 @@ function RoomContent() {
 
 export default function RoomPage() {
   return (
-    <SplitProvider>
-      <RoomContent />
-    </SplitProvider>
+     <RoomContent />
   );
 }
