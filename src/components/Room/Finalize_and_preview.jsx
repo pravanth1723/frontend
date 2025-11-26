@@ -13,6 +13,23 @@ export default function PreviewStep() {
   const [expenses, setExpenses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  function downloadPDF() {
+    const title = roomData?.title || 'expense_report';
+    const filename = `${title.replace(/\s+/g, '_')}.pdf`;
+    
+    // Temporarily set document title for PDF
+    const originalTitle = document.title;
+    document.title = filename;
+    
+    // Trigger print dialog
+    window.print();
+    
+    // Restore original title after a short delay
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 100);
+  }
+
   useEffect(() => {
     fetchData();
   }, [roomId]);
@@ -131,7 +148,7 @@ export default function PreviewStep() {
             )}
           </div>
           <div>
-            <button className="btn" onClick={() => window.print()}>Print PDF</button>
+            <button className="btn" onClick={downloadPDF}>Download PDF</button>
           </div>
         </div>
       </div>
@@ -208,6 +225,7 @@ export default function PreviewStep() {
                 <table style={{ width: '100%', fontSize: '12px', marginTop: 8 }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid #ddd' }}>
+                      <th style={{ padding: '4px', textAlign: 'left' }}>#</th>
                       <th style={{ padding: '4px', textAlign: 'left' }}>Expense</th>
                       <th style={{ padding: '4px', textAlign: 'right' }}>Share Amount</th>
                     </tr>
@@ -215,6 +233,7 @@ export default function PreviewStep() {
                   <tbody>
                     {personExpenses.map((exp, idx) => (
                       <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
+                        <td style={{ padding: '4px' }}>{idx + 1}</td>
                         <td style={{ padding: '4px' }}>{exp.description}</td>
                         <td style={{ padding: '4px', textAlign: 'right' }}>₹{exp.amount.toFixed(2)}</td>
                       </tr>
@@ -222,7 +241,7 @@ export default function PreviewStep() {
                   </tbody>
                   <tfoot>
                     <tr style={{ borderTop: '1px solid #ddd', fontWeight: 'bold' }}>
-                      <td style={{ padding: '4px' }}>Total Share</td>
+                      <td colSpan="2" style={{ padding: '4px' }}>Total Share</td>
                       <td style={{ padding: '4px', textAlign: 'right' }}>₹{totalShare.toFixed(2)}</td>
                     </tr>
                   </tfoot>

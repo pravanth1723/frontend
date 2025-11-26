@@ -38,7 +38,7 @@ export default function App() {
           </main>
 
           <footer className="app-footer">
-            <small>Frontend-only demo. Split data is in-memory per-room session.</small>
+            <small>Expense Splitting Application - Manage and track group expenses</small>
           </footer>
         </div>
       </AuthProvider>
