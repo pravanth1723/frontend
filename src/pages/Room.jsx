@@ -4,8 +4,8 @@ import { SplitProvider } from "../context/SplitContext";
 import RoomCreate from "../components/Rooms/CreateRoom";
 import Setup from "../components/Room/Setup";
 import Expenses from "../components/Room/Expenses";
-import AddExpenseStep from "../pages/split/AddExpenseStep";
-import PreviewStep from "./split/PreviewStep";
+import PreviewStep from "../components/Room/Finalize_and_preview"
+//import PreviewStep from "./split/PreviewStep";
 
 function RoomContent() {
   const { roomId } = useParams();
