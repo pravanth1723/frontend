@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useSplit } from "../../context/SplitContext";
 import axios from "axios";
-import ExpenseList from "../../components/ExpenseList";
 import EditExpenseModal from "../../components/EditExpenseModal";
 
 export default function AddExpenseStep() {
