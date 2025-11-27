@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Snackbar from "../Snackbar";
+import Spinner from "../Spinner";
 
 /**
  * Step 3 - Preview
@@ -125,7 +126,8 @@ export default function PreviewStep() {
   if (isLoading) {
     return (
       <div className="card">
-        <div style={{ padding: '20px', textAlign: 'center' }}>
+        <div style={{ padding: '40px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+          <Spinner size="medium" color="var(--primary)" />
           <div className="small">Loading...</div>
         </div>
       </div>

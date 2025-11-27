@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Snackbar from "../Snackbar";
+import Spinner from "../Spinner";
 
 /**
  * Setup Component
@@ -128,7 +129,8 @@ export default function Setup() {
   if (isLoading) {
     return (
       <div className="card">
-        <div style={{ padding: '20px', textAlign: 'center' }}>
+        <div style={{ padding: '40px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+          <Spinner size="medium" color="var(--primary)" />
           <div className="small">Loading room details...</div>
         </div>
       </div>
@@ -211,7 +213,8 @@ export default function Setup() {
           </div>
 
           <div className="controls">
-            <button className="btn" onClick={handleSave} disabled={isSaving}>
+            <button className="btn" onClick={handleSave} disabled={isSaving} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              {isSaving && <Spinner size="small" color="#ffffff" />}
               {isSaving ? "Saving..." : "Save"}
             </button>
             <button className="btn ghost" onClick={handleCancel} disabled={isSaving}>

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import EditExpenseModal from "../../components/EditExpenseModal";
 import Snackbar from "../../components/Snackbar";
+import Spinner from "../../components/Spinner";
 
 export default function AddExpenseStep() {
   const { roomId } = useParams();
@@ -225,7 +226,8 @@ export default function AddExpenseStep() {
   if (isLoading) {
     return (
       <div className="card">
-        <div style={{ padding: '20px', textAlign: 'center' }}>
+        <div style={{ padding: '40px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+          <Spinner size="medium" color="var(--primary)" />
           <div className="small">Loading room data...</div>
         </div>
       </div>
@@ -354,7 +356,8 @@ export default function AddExpenseStep() {
           )}
 
           <div className="controls">
-            <button className="btn" type="submit" disabled={isSaving}>
+            <button className="btn" type="submit" disabled={isSaving} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              {isSaving && <Spinner size="small" color="#ffffff" />}
               {isSaving ? "Saving..." : "Add Expense"}
             </button>
             <button className="btn secondary" type="button" onClick={() => navigate("../step3")}>

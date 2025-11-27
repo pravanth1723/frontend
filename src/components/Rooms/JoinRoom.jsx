@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Snackbar from "../Snackbar";
+import Spinner from "../Spinner";
 
 export default function JoinRoom() {
   const [joinRoomCode, setjoinRoomCode] = useState("");
@@ -75,7 +76,8 @@ export default function JoinRoom() {
         </div>
 
         <div className="controls">
-          <button className="btn" type="submit" disabled={isLoading}>
+          <button className="btn" type="submit" disabled={isLoading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            {isLoading && <Spinner size="small" color="#ffffff" />}
             {isLoading ? "Joining..." : "Join Room"}
           </button>
         </div>
