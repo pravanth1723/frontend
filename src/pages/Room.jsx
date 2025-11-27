@@ -23,7 +23,7 @@ function RoomContent() {
       </div>
 
       <div style={{ marginTop: 12 }}>
-        <nav style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+        <nav className="nav" style={{ marginBottom: 12 }}>
           <NavLink to={`/room/${roomId}/step1`} className={({isActive})=> isActive ? "active" : ""}>Step 1 - Setup</NavLink>
           <NavLink to={`/room/${roomId}/step2`} className={({isActive})=> isActive ? "active" : ""}>Step 2 - Add Expenses</NavLink>
           <NavLink to={`/room/${roomId}/step3`} className={({isActive})=> isActive ? "active" : ""}>Step 3 - Preview</NavLink>
