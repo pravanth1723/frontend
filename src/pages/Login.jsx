@@ -15,6 +15,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [userstate, setUserState] = useContext(store);
   const [snackbar, setSnackbar] = useState(null);
+  
   function handleSubmit(e) {
     e.preventDefault();
     setIsLoading(true);
@@ -39,41 +40,203 @@ export default function Login() {
         setIsLoading(false);
       });
   }
+
   return (
-    <div className="container-card" style={{ maxWidth: 480 }}>
-      <h2 className="section-title">Sign In</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 10 }}>
-          <label className="small">Username</label>
-          <input 
-            className="input" 
-            value={username} 
-            onChange={(e) => setUsername(e.target.value)} 
-            disabled={isLoading}
-          />
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '16px',
+        padding: '48px',
+        maxWidth: '460px',
+        width: '100%',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+        animation: 'slideUp 0.5s ease-out'
+      }}>
+        {/* Header */}
+        <div style={{ 
+          textAlign: 'center', 
+          marginBottom: '32px'
+        }}>
+          <div style={{ 
+            fontSize: '3.5rem', 
+            marginBottom: '16px'
+          }}>
+            💰
+          </div>
+          <h2 style={{ 
+            fontSize: '2rem', 
+            fontWeight: '700',
+            color: '#1f2937',
+            marginBottom: '8px'
+          }}>
+            Welcome Back
+          </h2>
+          <p style={{
+            color: '#6b7280',
+            fontSize: '0.95rem'
+          }}>
+            Sign in to manage your expenses
+          </p>
         </div>
-        <div style={{ marginBottom: 10 }}>
-          <label className="small">Password</label>
-          <input 
-            className="input" 
-            type="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ 
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#374151',
+              fontSize: '0.9rem'
+            }}>
+              Username
+            </label>
+            <input 
+              className="input" 
+              value={username} 
+              onChange={(e) => setUsername(e.target.value)} 
+              disabled={isLoading}
+              placeholder="Enter your username"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                transition: 'all 0.3s',
+                boxSizing: 'border-box',
+                backgroundColor: isLoading ? '#f9fafb' : 'white'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#667eea';
+                e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e5e7eb';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{ 
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#374151',
+              fontSize: '0.9rem'
+            }}>
+              Password
+            </label>
+            <input 
+              className="input" 
+              type="password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
+              placeholder="Enter your password"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                transition: 'all 0.3s',
+                boxSizing: 'border-box',
+                backgroundColor: isLoading ? '#f9fafb' : 'white'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#667eea';
+                e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e5e7eb';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
+          </div>
+
+          <button 
+            type="submit" 
             disabled={isLoading}
-          />
-        </div>
-        <div className="controls">
-          <button className="btn" type="submit" disabled={isLoading}>
+            style={{
+              width: '100%',
+              padding: '14px 24px',
+              backgroundColor: isLoading ? '#9ca3af' : '#667eea',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '700',
+              fontSize: '1.05rem',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s',
+              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              marginBottom: '16px'
+            }}
+            onMouseEnter={(e) => {
+              if (!isLoading) {
+                e.target.style.backgroundColor = '#5568d3';
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.4)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isLoading) {
+                e.target.style.backgroundColor = '#667eea';
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+              }
+            }}
+          >
             {isLoading ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+              <>
                 <Spinner size="small" color="#ffffff" />
                 <span>Logging in...</span>
-              </div>
-            ) : 'Login'}
+              </>
+            ) : (
+              <>
+                <span>🔐</span>
+                <span>Sign In</span>
+              </>
+            )}
           </button>
-          <Link to="/register"><button type="button" className="btn ghost" disabled={isLoading}>Register</button></Link>
-        </div>
-      </form>
+
+          <div style={{
+            textAlign: 'center',
+            paddingTop: '16px',
+            borderTop: '1px solid #e5e7eb'
+          }}>
+            <span style={{ color: '#6b7280', fontSize: '0.95rem' }}>
+              Don't have an account?{' '}
+            </span>
+            <Link 
+              to="/register"
+              style={{
+                color: '#667eea',
+                fontWeight: '600',
+                textDecoration: 'none',
+                fontSize: '0.95rem',
+                transition: 'color 0.3s'
+              }}
+              onMouseEnter={(e) => e.target.style.color = '#5568d3'}
+              onMouseLeave={(e) => e.target.style.color = '#667eea'}
+            >
+              Create one now
+            </Link>
+          </div>
+        </form>
+      </div>
 
       {snackbar && (
         <Snackbar
@@ -82,6 +245,21 @@ export default function Login() {
           onClose={() => setSnackbar(null)}
         />
       )}
+
+      <style>
+        {`
+          @keyframes slideUp {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
     </div>
   );
 }
