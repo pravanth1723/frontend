@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import EditExpenseModal from "../../components/EditExpenseModal";
+import Snackbar from "../../components/Snackbar";
 
 export default function AddExpenseStep() {
   const { roomId } = useParams();
@@ -26,6 +27,7 @@ export default function AddExpenseStep() {
   const [editing, setEditing] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isExpenseListOpen, setIsExpenseListOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,8 +41,8 @@ export default function AddExpenseStep() {
     setIsLoading(true);
     axios.get(`http://localhost:5000/api/rooms/${roomId}`, { withCredentials: true })
       .then(response => {
-        if (response.status >= 200 && response.status < 300) {
-          const data = response.data;
+        if (response.status===200) {
+          const data = response.data.data;
           setRoomTitle(data.title || "");
           setMembers(data.members || []);
           setOrganizer(data.organizer || "");
@@ -56,8 +58,8 @@ export default function AddExpenseStep() {
   function fetchExpenses() {
     axios.get(`http://localhost:5000/api/expenses/by-room-id/${roomId}`, { withCredentials: true })
       .then(response => {
-        if (response.status >= 200) {
-          setApiExpenses(response.data || []);
+        if (response.status === 200) {
+          setApiExpenses(response.data.data || []);
         }
       })
       .catch(error => {
@@ -89,8 +91,14 @@ export default function AddExpenseStep() {
   
   function addPaidEntry() {
     const amt = parseFloat(amount);
-    if (!payer) return alert("Select a payer");
-    if (!amt || amt <= 0) return alert("Enter a valid amount");
+    if (!payer) {
+      setSnackbar({ category: 'error', message: 'Select a payer' });
+      return;
+    }
+    if (!amt || amt <= 0) {
+      setSnackbar({ category: 'error', message: 'Enter a valid amount' });
+      return;
+    }
     setPaidEntries(prev => [...prev, { name: payer, amount: amt }]);
     setPayer("");
     setAmount("");
@@ -103,9 +111,18 @@ export default function AddExpenseStep() {
   function submitExpense(e) {
     e && e.preventDefault();
     
-    if (!description.trim()) return alert("Expense description required");
-    if (selected.length === 0) return alert("Select at least one person who shares");
-    if (paidEntries.length === 0) return alert("Add at least one paid-by entry");
+    if (!description.trim()) {
+      setSnackbar({ category: 'error', message: 'Expense description required' });
+      return;
+    }
+    if (selected.length === 0) {
+      setSnackbar({ category: 'error', message: 'Select at least one person who shares' });
+      return;
+    }
+    if (paidEntries.length === 0) {
+      setSnackbar({ category: 'error', message: 'Add at least one paid-by entry' });
+      return;
+    }
     
     let spentBy = [];
     let spentFor = [];
@@ -135,7 +152,8 @@ export default function AddExpenseStep() {
       
       const totalSpentFor = spentFor.reduce((sum, item) => sum + item.amount, 0);
       if (Math.abs(totalSpentFor - total) > 0.01) {
-        return alert(`Total split amount (${totalSpentFor.toFixed(2)}) must equal paid amount (${total.toFixed(2)})`);
+        setSnackbar({ category: 'error', message: `Total split amount (₹${totalSpentFor.toFixed(2)}) must equal paid amount (₹${total.toFixed(2)})` });
+        return;
       }
     }
     
@@ -144,27 +162,27 @@ export default function AddExpenseStep() {
     axios.post('http://localhost:5000/api/expenses', {
       roomId: roomId,
       description: description.trim(),
+      category: "multiple",
       total: total,
       spentBy: spentBy,
       spentFor: spentFor
     }, { withCredentials: true })
       .then(response => {
-        if (response.status >= 200 && response.status < 300) {
-          alert("Expense added successfully");
+        if (response.status === 200) {
+          setSnackbar({ category: 'success', message: 'Expense added successfully' });
           // Reset form
           setDescription("");
           setSelected([]);
           setSplitType("equal");
           setIndividualAmounts({});
           setPaidEntries([]);
-          // Fetch updated expenses list
           fetchExpenses();
         }
         setIsSaving(false);
       })
       .catch(error => {
         console.error('Error adding expense:', error);
-        alert("Error adding expense");
+        setSnackbar({ category: 'error', message: 'Error adding expense' });
         setIsSaving(false);
       });
   }
@@ -178,29 +196,29 @@ export default function AddExpenseStep() {
     
     axios.delete(`http://localhost:5000/api/expenses/${expenseId}`, { withCredentials: true })
       .then(response => {
-        if (response.status >= 200 && response.status < 300) {
-          alert("Expense deleted successfully");
+        if (response.status === 200) {
+          setSnackbar({ category: 'success', message: 'Expense deleted successfully' });
           fetchExpenses();
         }
       })
       .catch(error => {
         console.error('Error deleting expense:', error);
-        alert("Error deleting expense");
+        setSnackbar({ category: 'error', message: 'Error deleting expense' });
       });
   }
   
   function applyEdit(expenseId, updatedData) {
     axios.put(`http://localhost:5000/api/expenses/${expenseId}`, updatedData, { withCredentials: true })
       .then(response => {
-        if (response.status >= 200 && response.status < 300) {
-          alert("Expense updated successfully");
+        if (response.status === 200) {
+          setSnackbar({ category: 'success', message: 'Expense updated successfully' });
           setEditing(null);
           fetchExpenses();
         }
       })
       .catch(error => {
         console.error('Error updating expense:', error);
-        alert("Error updating expense");
+        setSnackbar({ category: 'error', message: 'Error updating expense' });
       });
   }
 
@@ -439,6 +457,14 @@ export default function AddExpenseStep() {
           members={members} 
           onClose={() => setEditing(null)} 
           onApply={(newExp) => applyEdit(editing._id, newExp)} 
+        />
+      )}
+
+      {snackbar && (
+        <Snackbar
+          category={snackbar.category}
+          message={snackbar.message}
+          onClose={() => setSnackbar(null)}
         />
       )}
     </div>

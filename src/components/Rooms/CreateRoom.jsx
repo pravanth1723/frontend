@@ -13,7 +13,7 @@ export default function CreateRoom({ onRoomCreated }) {
     const roomCode = roomIdInput.trim() || `room-${Date.now()}`;
     axios.post('http://localhost:5000/api/rooms', { roomCode, passcode, kind }, { withCredentials: true })
       .then(response => {
-        if (response.status >= 200 && response.status < 300) {
+        if (response.status === 200) {
           setRoomIdInput("");
           setPasscode("");
           if (onRoomCreated) {

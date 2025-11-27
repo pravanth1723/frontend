@@ -1,18 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Snackbar from "../Snackbar";
 
 export default function JoinRoom() {
   const [joinRoomCode, setjoinRoomCode] = useState("");
   const [passcode, setPasscode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState(null);
   const navigate = useNavigate();
 
   function handleJoinRoom(e) {
     e.preventDefault();
     
     if (!joinRoomCode.trim()) {
-      alert("Please enter a room code");
+      setSnackbar({ category: 'error', message: 'Please enter a room code' });
       return;
     }
 
@@ -25,18 +27,21 @@ export default function JoinRoom() {
     )
       .then(response => {
         if (response.status >= 200 && response.status < 300) {
+          setSnackbar({ category: 'success', message: 'Successfully joined room!' });
           // Successfully verified, navigate to room
-          navigate(`/room/${encodeURIComponent(joinRoomCode.trim())}/step1`);
+          setTimeout(() => {
+            navigate(`/room/${encodeURIComponent(joinRoomCode.trim())}/step1`);
+          }, 1000);
         }
       })
       .catch(error => {
         setIsLoading(false);
         if (error.response?.status === 401) {
-          alert('Invalid room code or passcode');
+          setSnackbar({ category: 'error', message: 'Invalid room code or passcode' });
         } else if (error.response?.status === 404) {
-          alert('Room not found');
+          setSnackbar({ category: 'error', message: 'Room not found' });
         } else {
-          alert('Error joining room. Please try again.');
+          setSnackbar({ category: 'error', message: 'Error joining room. Please try again.' });
         }
         console.error('Error joining room:', error);
       });
@@ -75,6 +80,14 @@ export default function JoinRoom() {
           </button>
         </div>
       </form>
+
+      {snackbar && (
+        <Snackbar
+          category={snackbar.category}
+          message={snackbar.message}
+          onClose={() => setSnackbar(null)}
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import Snackbar from "../Snackbar";
 
 /**
  * Setup Component
@@ -25,6 +26,7 @@ export default function Setup() {
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [snackbar, setSnackbar] = useState(null);
 
   useEffect(() => {
     if (roomId) {
@@ -36,23 +38,21 @@ export default function Setup() {
     setIsLoading(true);
     axios.get(`http://localhost:5000/api/rooms/${roomId}`, { withCredentials: true })
       .then(response => {
-        if (response.status >= 200 && response.status < 300) {
-          const data = response.data;
+        if (response.status === 200) {
+          const data = response.data.data;
           setRoomName(data.name || "");
           setTitle(data.title || "");
           setPersons(data.members || []);
           setOrganizer(data.organizer || "");
           setNotes(data.notes || "");
-          
           setEditTitle(data.title || "");
           setEditPersonsText((data.members || []).join("\n"));
           setEditOrganizer(data.organizer || "");
-          setEditNotes(data.notes || "");
-        }
+          setEditNotes(data.notes || "");}
         setIsLoading(false);
       })
       .catch(error => {
-        console.error('Error fetching room metadata:', error);
+        setSnackbar({ category: 'error', message: 'Failed to load room data' });
         setIsLoading(false);
       });
   }
@@ -77,15 +77,15 @@ export default function Setup() {
     const personsList = editPersonsText.split("\n").map(s => s.trim()).filter(Boolean);
     
     if (!editTitle.trim()) {
-      alert("Please provide a title");
+      setSnackbar({ category: 'error', message: 'Please provide a title' });
       return;
     }
     if (personsList.length < 2) {
-      alert("Please add at least two persons");
+      setSnackbar({ category: 'error', message: 'Please add at least two persons' });
       return;
     }
     if (!editOrganizer || !personsList.includes(editOrganizer)) {
-      alert("Please select a valid organizer from the persons list");
+      setSnackbar({ category: 'error', message: 'Please select a valid organizer from the persons list' });
       return;
     }
 
@@ -98,26 +98,26 @@ export default function Setup() {
       notes: editNotes
     }, { withCredentials: true })
       .then(response => {
-        if (response.status >= 200 && response.status < 300) {
+        if (response.status === 200) {
           setTitle(editTitle.trim());
           setPersons(personsList);
           setOrganizer(editOrganizer);
           setNotes(editNotes);
           setIsEditing(false);
-          alert("Room details saved successfully");
+          setSnackbar({ category: 'success', message: 'Room details saved successfully' });
         }
         setIsSaving(false);
       })
       .catch(error => {
         console.error('Error saving room details:', error);
-        alert("Error saving room details");
+        setSnackbar({ category: 'error', message: 'Error saving room details' });
         setIsSaving(false);
       });
   }
 
   function next() {
     if (!title || !persons.length || !organizer) {
-      alert("Please complete the setup before proceeding");
+      setSnackbar({ category: 'error', message: 'Please complete the setup before proceeding' });
       return;
     }
     navigate("../step2");
@@ -278,6 +278,14 @@ export default function Setup() {
             <button className="btn" onClick={next}>Next: Add Expenses</button>
           </div>
         </div>
+      )}
+
+      {snackbar && (
+        <Snackbar
+          category={snackbar.category}
+          message={snackbar.message}
+          onClose={() => setSnackbar(null)}
+        />
       )}
     </div>
   );

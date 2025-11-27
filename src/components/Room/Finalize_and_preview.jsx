@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import Snackbar from "../Snackbar";
 
 /**
  * Step 3 - Preview
@@ -13,6 +14,7 @@ export default function PreviewStep() {
   const [roomData, setRoomData] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [snackbar, setSnackbar] = useState(null);
 
   function downloadPDF() {
     const title = roomData?.title || 'expense_report';
@@ -41,15 +43,17 @@ export default function PreviewStep() {
       
       // Fetch room metadata
       const roomRes = await axios.get(`http://localhost:5000/api/rooms/${roomId}`, { withCredentials: true });
-      setRoomData(roomRes.data);
+      setRoomData(roomRes.data.data);
       
       // Fetch expenses for this room
-      const expenseRes = await axios.get(`http://localhost:5000/api/expenses/by-room-id/${roomId}`, { withCredentials: true });
-      
+      const expenseRes = (await axios.get(`http://localhost:5000/api/expenses/by-room-id/${roomId}`, { withCredentials: true })).data;
+      // expenseRes = expenseRes.;
       // Check if expenses array is empty
       if (!expenseRes.data || expenseRes.data.length === 0) {
-        alert("No expenses added yet. Please add expenses first.");
-        navigate(`/room/${roomId}/step2`);
+        setSnackbar({ category: 'error', message: 'No expenses added yet. Please add expenses first.' });
+        setTimeout(() => {
+          navigate(`/room/${roomId}/step2`);
+        }, 2000);
         return;
       }
       
@@ -58,6 +62,7 @@ export default function PreviewStep() {
       setIsLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
+      setSnackbar({ category: 'error', message: 'Failed to load data. Please try again.' });
       setIsLoading(false);
     }
   }
@@ -325,6 +330,14 @@ export default function PreviewStep() {
           <em>Note: Positive balance means the person owes money to the organizer. Negative balance means the person paid more than their share.</em>
         </p>
       </div>
+
+      {snackbar && (
+        <Snackbar
+          category={snackbar.category}
+          message={snackbar.message}
+          onClose={() => setSnackbar(null)}
+        />
+      )}
     </div>
   );
 }
