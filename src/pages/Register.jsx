@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import Snackbar from '../components/Snackbar';
+
 /**
  * Register page
  */
@@ -9,25 +11,34 @@ export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [snackbar, setSnackbar] = useState(null);
+  const navigate = useNavigate();
 
   function handleSubmit(e) {
     e.preventDefault();
     
-  axios.post('http://localhost:5000/api/users/register',{username, password}).then(
-            response=>{
-                // alert(response.status+1);
-                if(response.status >= 200 && response.status < 300){
-                    alert('Account created successfully');
-                    window.location.reload();
-                }
-                else{
-                    alert('some thing went wrong');
-                }
-            }
-        ).catch(error=>
-          console.log(error)
-            //alert('Email already used please try with other email'),
-        );
+    if (password !== confirm) {
+      setSnackbar({ category: 'error', message: 'Passwords do not match!' });
+      return;
+    }
+
+    axios.post('http://localhost:5000/api/users/register', { username, password }, { withCredentials: true })
+      .then(response => {
+        if (response.status >= 200 && response.status < 300) {
+          setSnackbar({ category: 'success', message: 'Account created successfully!' });
+          // Navigate to login after short delay
+          setTimeout(() => {
+            navigate('/login');
+          }, 1500);
+        } else {
+          setSnackbar({ category: 'error', message: 'Something went wrong' });
+        }
+      })
+      .catch(error => {
+        console.error('Registration error:', error);
+        const errorMsg = error.response?.data?.message || 'Registration failed. Username may already exist.';
+        setSnackbar({ category: 'error', message: errorMsg });
+      });
   }
 
   return (
@@ -51,6 +62,14 @@ export default function Register() {
           <Link to="/login"><button type="button" className="btn ghost">Back to Login</button></Link>
         </div>
       </form>
+
+      {snackbar && (
+        <Snackbar
+          category={snackbar.category}
+          message={snackbar.message}
+          onClose={() => setSnackbar(null)}
+        />
+      )}
     </div>
   );
 }

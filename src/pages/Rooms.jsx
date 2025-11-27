@@ -3,6 +3,7 @@ import axios from "axios";
 import CreateRoom from "../components/Rooms/CreateRoom";
 import RoomsList from "../components/Rooms/RoomsList";
 import JoinRoomComponent from "../components/Rooms/JoinRoom";
+import Snackbar from "../components/Snackbar";
 
 /**
  * RoomsPage
@@ -11,6 +12,7 @@ import JoinRoomComponent from "../components/Rooms/JoinRoom";
  */
 export default function RoomsPage() {
   const [apiRooms, setApiRooms] = useState([]);
+  const [snackbar, setSnackbar] = useState(null);
 
   useEffect(() => {
     fetchRooms();
@@ -19,14 +21,15 @@ export default function RoomsPage() {
   function fetchRooms() {
     axios.get('http://localhost:5000/api/rooms', { withCredentials: true })
       .then(response => {
-        if (response.status >= 200 && response.status < 300) {
+        if (response.status === 200) {
           console.log('Rooms fetched from API:', response.data);
-          const rooms = Array.isArray(response.data) ? response.data : [];
+          const rooms = Array.isArray(response.data.data) ? response.data.data : [];
           setApiRooms(rooms);
         }
       })
       .catch(error => {
         console.error('Error fetching rooms:', error);
+        setSnackbar({ category: 'error', message: 'Failed to fetch rooms. Please try again.' });
         setApiRooms([]);
       });
   }
@@ -48,6 +51,14 @@ export default function RoomsPage() {
           <RoomsList rooms={apiRooms} />
         </div>
       </div>
+
+      {snackbar && (
+        <Snackbar
+          category={snackbar.category}
+          message={snackbar.message}
+          onClose={() => setSnackbar(null)}
+        />
+      )}
     </div>
   );
 }
