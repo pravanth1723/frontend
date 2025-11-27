@@ -48,7 +48,7 @@ export default function PreviewStep() {
       
       // Fetch expenses for this room
       const expenseRes = (await axios.get(`http://localhost:5000/api/expenses/by-room-id/${roomId}`, { withCredentials: true })).data;
-      // expenseRes = expenseRes.;
+      
       // Check if expenses array is empty
       if (!expenseRes.data || expenseRes.data.length === 0) {
         setSnackbar({ category: 'error', message: 'No expenses added yet. Please add expenses first.' });
@@ -125,21 +125,34 @@ export default function PreviewStep() {
 
   if (isLoading) {
     return (
-      <div className="card">
-        <div style={{ padding: '40px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-          <Spinner size="medium" color="var(--primary)" />
-          <div className="small">Loading...</div>
-        </div>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        padding: '40px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '16px'
+      }}>
+        <Spinner size="large" color="var(--primary)" />
+        <div style={{ color: '#6b7280', fontSize: '1rem' }}>Loading preview...</div>
       </div>
     );
   }
 
   if (!roomData) {
     return (
-      <div className="card">
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <div className="small">Room not found</div>
-        </div>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        padding: '40px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+        textAlign: 'center'
+      }}>
+        <div style={{ fontSize: '3rem', marginBottom: '16px' }}>❌</div>
+        <div style={{ color: '#6b7280', fontSize: '1.1rem' }}>Room not found</div>
       </div>
     );
   }
@@ -151,66 +164,169 @@ export default function PreviewStep() {
   return (
     <div>
       {/* Header Section - Room Info */}
-      <div className="card">
-        <h3 className="small">Finalize & Preview</h3>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "start" }}>
-          <div>
-            <div className="small">Title</div>
-            <div style={{ fontWeight: 700 }}>{roomData.title || "(untitled)"}</div>
-            <div className="small" style={{ marginTop: 4 }}>Organizer: <b>{organizer || "(none)"}</b></div>
-            <div className="small" style={{ marginTop: 4 }}>Members: <b>{members.join(", ")}</b></div>
-            {roomData.notes && (
-              <div className="small" style={{ marginTop: 4 }}>Notes: <i>{roomData.notes}</i></div>
-            )}
+      <div style={{
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        borderRadius: '12px',
+        padding: '24px',
+        boxShadow: '0 8px 20px rgba(102, 126, 234, 0.3)',
+        marginBottom: '20px'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: '20px' }}>
+          <div style={{ flex: 1 }}>
+            <h3 style={{ 
+              fontSize: '1.75rem', 
+              marginBottom: '20px', 
+              fontWeight: '700',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              <span style={{ fontSize: '2rem' }}>📊</span>
+              Finalize & Preview
+            </h3>
+            <div style={{ 
+              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+              borderRadius: '8px',
+              padding: '16px',
+              marginBottom: '12px'
+            }}>
+              <div style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '8px' }}>
+                {roomData.title || "(untitled)"}
+              </div>
+              <div style={{ fontSize: '0.9rem', opacity: 0.9, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div>
+                  <span style={{ fontWeight: '600' }}>👑 Organizer:</span> {organizer || "(none)"}
+                </div>
+                <div>
+                  <span style={{ fontWeight: '600' }}>👥 Members:</span> {members.join(", ")}
+                </div>
+                {roomData.notes && (
+                  <div style={{ marginTop: '8px', fontStyle: 'italic', opacity: 0.85 }}>
+                    <span style={{ fontWeight: '600' }}>📝 Notes:</span> {roomData.notes}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-          <div>
-            <button className="btn" onClick={downloadPDF}>Download PDF</button>
-          </div>
+          <button 
+            onClick={downloadPDF}
+            style={{
+              backgroundColor: 'white',
+              color: '#667eea',
+              border: 'none',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              fontWeight: '600',
+              fontSize: '1rem',
+              cursor: 'pointer',
+              transition: 'all 0.3s',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              whiteSpace: 'nowrap'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.15)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+            }}
+          >
+            <span style={{ fontSize: '1.2rem' }}>📥</span>
+            Download PDF
+          </button>
         </div>
       </div>
 
       {/* All Expenses Table */}
-      <div className="card" style={{ marginTop: 12 }}>
-        <h4 className="small">All Expenses</h4>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        padding: '24px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+        marginBottom: '20px'
+      }}>
+        <h4 style={{ 
+          fontSize: '1.3rem', 
+          marginBottom: '16px',
+          color: '#1f2937',
+          fontWeight: '700',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <span style={{ fontSize: '1.5rem' }}>💰</span>
+          All Expenses
+        </h4>
         {expenses.length === 0 ? (
-          <div className="small" style={{ color: '#999', padding: '20px', textAlign: 'center' }}>
+          <div style={{ 
+            color: '#9ca3af', 
+            padding: '40px', 
+            textAlign: 'center',
+            backgroundColor: '#f9fafb',
+            borderRadius: '8px'
+          }}>
+            <div style={{ fontSize: '3rem', marginBottom: '12px' }}>📭</div>
             No expenses added yet
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 8 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ borderBottom: '2px solid #ddd', background: '#f5f5f5' }}>
-                  <th style={{ padding: '8px', textAlign: 'left' }}>#</th>
-                  <th style={{ padding: '8px', textAlign: 'left' }}>Description</th>
-                  <th style={{ padding: '8px', textAlign: 'right' }}>Total Amount</th>
-                  <th style={{ padding: '8px', textAlign: 'left' }}>Paid By</th>
-                  <th style={{ padding: '8px', textAlign: 'left' }}>Split Among</th>
+                <tr style={{ 
+                  borderBottom: '2px solid #e5e7eb',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white'
+                }}>
+                  <th style={{ padding: '12px', textAlign: 'left', borderRadius: '8px 0 0 0' }}>#</th>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>Description</th>
+                  <th style={{ padding: '12px', textAlign: 'right' }}>Total Amount</th>
+                  <th style={{ padding: '12px', textAlign: 'left' }}>Paid By</th>
+                  <th style={{ padding: '12px', textAlign: 'left', borderRadius: '0 8px 0 0' }}>Split Among</th>
                 </tr>
               </thead>
               <tbody>
                 {expenses.map((exp, i) => (
-                  <tr key={exp._id} style={{ borderBottom: '1px solid #eee' }}>
-                    <td style={{ padding: '8px' }}>{i + 1}</td>
-                    <td style={{ padding: '8px' }}>{exp.description}</td>
-                    <td style={{ padding: '8px', textAlign: 'right', fontWeight: 600 }}>₹{exp.total.toFixed(2)}</td>
-                    <td style={{ padding: '8px', fontSize: '12px' }}>
+                  <tr key={exp._id} style={{ 
+                    borderBottom: '1px solid #f3f4f6',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                    <td style={{ padding: '12px', fontWeight: '600', color: '#667eea' }}>{i + 1}</td>
+                    <td style={{ padding: '12px', fontWeight: '500' }}>{exp.description}</td>
+                    <td style={{ padding: '12px', textAlign: 'right', fontWeight: '700', color: '#059669' }}>
+                      ₹{exp.total.toFixed(2)}
+                    </td>
+                    <td style={{ padding: '12px', fontSize: '0.9rem' }}>
                       {exp.spentBy.map((p, idx) => (
-                        <div key={idx}>{p.name}: ₹{p.amount.toFixed(2)}</div>
+                        <div key={idx} style={{ marginBottom: '2px' }}>
+                          <span style={{ fontWeight: '500' }}>{p.name}:</span> ₹{p.amount.toFixed(2)}
+                        </div>
                       ))}
                     </td>
-                    <td style={{ padding: '8px', fontSize: '12px' }}>
+                    <td style={{ padding: '12px', fontSize: '0.9rem' }}>
                       {exp.spentFor.map((p, idx) => (
-                        <div key={idx}>{p.name}: ₹{p.amount.toFixed(2)}</div>
+                        <div key={idx} style={{ marginBottom: '2px' }}>
+                          <span style={{ fontWeight: '500' }}>{p.name}:</span> ₹{p.amount.toFixed(2)}
+                        </div>
                       ))}
                     </td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
-                <tr style={{ borderTop: '2px solid #ddd', fontWeight: 'bold' }}>
-                  <td colSpan="2" style={{ padding: '8px' }}>Total</td>
-                  <td style={{ padding: '8px', textAlign: 'right' }}>
+                <tr style={{ 
+                  borderTop: '2px solid #e5e7eb',
+                  backgroundColor: '#f9fafb',
+                  fontWeight: 'bold'
+                }}>
+                  <td colSpan="2" style={{ padding: '12px', fontSize: '1.1rem' }}>Total</td>
+                  <td style={{ padding: '12px', textAlign: 'right', fontSize: '1.2rem', color: '#059669' }}>
                     ₹{expenses.reduce((sum, exp) => sum + exp.total, 0).toFixed(2)}
                   </td>
                   <td colSpan="2"></td>
@@ -222,50 +338,122 @@ export default function PreviewStep() {
       </div>
 
       {/* Per-person Expense Breakdown */}
-      <div className="card" style={{ marginTop: 12 }}>
-        <h4 className="small">Individual Expense Breakdown</h4>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        padding: '24px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+        marginBottom: '20px'
+      }}>
+        <h4 style={{ 
+          fontSize: '1.3rem', 
+          marginBottom: '20px',
+          color: '#1f2937',
+          fontWeight: '700',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <span style={{ fontSize: '1.5rem' }}>👤</span>
+          Individual Expense Breakdown
+        </h4>
         {members.map(member => {
           const personExpenses = userExpenses[member] || [];
           const totalShare = userOwesMap[member] || 0;
           const totalPaid = userPaidMap[member] || 0;
           
           return (
-            <div key={member} style={{ marginBottom: 16, padding: 12, background: '#f9f9f9', borderRadius: 6 }}>
-              <div style={{ fontWeight: 700, marginBottom: 8, fontSize: '14px' }}>
-                {member} {member === organizer ? <span style={{ fontSize: '12px', color: '#666' }}>(Organizer)</span> : ''}
+            <div key={member} style={{ 
+              marginBottom: '20px',
+              padding: '16px',
+              background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+              borderRadius: '10px',
+              border: '2px solid #fbbf24',
+              boxShadow: '0 2px 8px rgba(251, 191, 36, 0.2)'
+            }}>
+              <div style={{ 
+                fontWeight: '700',
+                marginBottom: '12px',
+                fontSize: '1.1rem',
+                color: '#92400e',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span>{member === organizer ? '👑' : '👤'}</span>
+                {member}
+                {member === organizer && (
+                  <span style={{ 
+                    fontSize: '0.75rem',
+                    color: '#78350f',
+                    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                    padding: '2px 8px',
+                    borderRadius: '4px',
+                    fontWeight: '600'
+                  }}>
+                    Organizer
+                  </span>
+                )}
               </div>
               
               {personExpenses.length === 0 ? (
-                <div className="small" style={{ color: '#999' }}>No expenses for this person</div>
+                <div style={{ 
+                  color: '#92400e',
+                  fontStyle: 'italic',
+                  padding: '12px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                  borderRadius: '6px',
+                  textAlign: 'center'
+                }}>
+                  No expenses for this person
+                </div>
               ) : (
-                <table style={{ width: '100%', fontSize: '12px', marginTop: 8 }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid #ddd' }}>
-                      <th style={{ padding: '4px', textAlign: 'left' }}>#</th>
-                      <th style={{ padding: '4px', textAlign: 'left' }}>Expense</th>
-                      <th style={{ padding: '4px', textAlign: 'right' }}>Share Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {personExpenses.map((exp, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
-                        <td style={{ padding: '4px' }}>{idx + 1}</td>
-                        <td style={{ padding: '4px' }}>{exp.description}</td>
-                        <td style={{ padding: '4px', textAlign: 'right' }}>₹{exp.amount.toFixed(2)}</td>
+                <div style={{ 
+                  backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                  borderRadius: '8px',
+                  padding: '12px'
+                }}>
+                  <table style={{ width: '100%', fontSize: '0.9rem' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #fbbf24' }}>
+                        <th style={{ padding: '8px', textAlign: 'left', color: '#92400e' }}>#</th>
+                        <th style={{ padding: '8px', textAlign: 'left', color: '#92400e' }}>Expense</th>
+                        <th style={{ padding: '8px', textAlign: 'right', color: '#92400e' }}>Share Amount</th>
                       </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr style={{ borderTop: '1px solid #ddd', fontWeight: 'bold' }}>
-                      <td colSpan="2" style={{ padding: '4px' }}>Total Share</td>
-                      <td style={{ padding: '4px', textAlign: 'right' }}>₹{totalShare.toFixed(2)}</td>
-                    </tr>
-                  </tfoot>
-                </table>
+                    </thead>
+                    <tbody>
+                      {personExpenses.map((exp, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #fde68a' }}>
+                          <td style={{ padding: '8px', fontWeight: '600', color: '#78350f' }}>{idx + 1}</td>
+                          <td style={{ padding: '8px', color: '#92400e' }}>{exp.description}</td>
+                          <td style={{ padding: '8px', textAlign: 'right', fontWeight: '600', color: '#92400e' }}>
+                            ₹{exp.amount.toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr style={{ borderTop: '2px solid #fbbf24', fontWeight: 'bold' }}>
+                        <td colSpan="2" style={{ padding: '8px', color: '#78350f' }}>Total Share</td>
+                        <td style={{ padding: '8px', textAlign: 'right', fontSize: '1.05rem', color: '#78350f' }}>
+                          ₹{totalShare.toFixed(2)}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
               )}
               
-              <div style={{ marginTop: 8, fontSize: '12px' }}>
-                <div>Paid: <b>₹{totalPaid.toFixed(2)}</b></div>
+              <div style={{ 
+                marginTop: '12px',
+                fontSize: '0.95rem',
+                padding: '8px 12px',
+                backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                borderRadius: '6px',
+                color: '#78350f',
+                fontWeight: '600'
+              }}>
+                💳 Total Paid: ₹{totalPaid.toFixed(2)}
               </div>
             </div>
           );
@@ -273,17 +461,38 @@ export default function PreviewStep() {
       </div>
 
       {/* Final Settlement Table */}
-      <div className="card" style={{ marginTop: 12 }}>
-        <h4 className="small">Final Settlement (Payments to Organizer)</h4>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        padding: '24px',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+        marginBottom: '20px'
+      }}>
+        <h4 style={{ 
+          fontSize: '1.3rem', 
+          marginBottom: '16px',
+          color: '#1f2937',
+          fontWeight: '700',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <span style={{ fontSize: '1.5rem' }}>💸</span>
+          Final Settlement (Payments to Organizer)
+        </h4>
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: 8 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ borderBottom: '2px solid #ddd', background: '#f5f5f5' }}>
-                <th style={{ padding: '8px', textAlign: 'left' }}>Person</th>
-                <th style={{ padding: '8px', textAlign: 'right' }}>Total Share</th>
-                <th style={{ padding: '8px', textAlign: 'right' }}>Total Paid</th>
-                <th style={{ padding: '8px', textAlign: 'right' }}>Balance</th>
-                <th style={{ padding: '8px', textAlign: 'center' }}>Action</th>
+              <tr style={{ 
+                borderBottom: '2px solid #e5e7eb',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: 'white'
+              }}>
+                <th style={{ padding: '12px', textAlign: 'left', borderRadius: '8px 0 0 0' }}>Person</th>
+                <th style={{ padding: '12px', textAlign: 'right' }}>Total Share</th>
+                <th style={{ padding: '12px', textAlign: 'right' }}>Total Paid</th>
+                <th style={{ padding: '12px', textAlign: 'right' }}>Balance</th>
+                <th style={{ padding: '12px', textAlign: 'center', borderRadius: '0 8px 0 0' }}>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -295,31 +504,97 @@ export default function PreviewStep() {
                 
                 return (
                   <tr key={m} style={{ 
-                    borderBottom: '1px solid #eee',
-                    background: isOrganizer ? '#faf3ff' : 'transparent'
+                    borderBottom: '1px solid #f3f4f6',
+                    background: isOrganizer ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%)' : 'transparent',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isOrganizer) e.currentTarget.style.backgroundColor = '#f9fafb';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isOrganizer) e.currentTarget.style.backgroundColor = 'transparent';
                   }}>
-                    <td style={{ padding: '8px', fontWeight: isOrganizer ? 700 : 400 }}>
-                      {m} {isOrganizer ? <span className="small">(Organizer)</span> : ''}
-                    </td>
-                    <td style={{ padding: '8px', textAlign: 'right' }}>₹{share.toFixed(2)}</td>
-                    <td style={{ padding: '8px', textAlign: 'right' }}>₹{paid.toFixed(2)}</td>
                     <td style={{ 
-                      padding: '8px', 
+                      padding: '12px',
+                      fontWeight: isOrganizer ? 700 : 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span>{isOrganizer ? '👑' : '👤'}</span>
+                      {m}
+                      {isOrganizer && (
+                        <span style={{ 
+                          fontSize: '0.7rem',
+                          color: '#78350f',
+                          backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          fontWeight: '600'
+                        }}>
+                          Organizer
+                        </span>
+                      )}
+                    </td>
+                    <td style={{ padding: '12px', textAlign: 'right', fontWeight: '600' }}>
+                      ₹{share.toFixed(2)}
+                    </td>
+                    <td style={{ padding: '12px', textAlign: 'right', fontWeight: '600' }}>
+                      ₹{paid.toFixed(2)}
+                    </td>
+                    <td style={{ 
+                      padding: '12px',
                       textAlign: 'right',
-                      fontWeight: 600,
-                      color: balance > 0 ? '#d32f2f' : balance < 0 ? '#388e3c' : '#666'
+                      fontWeight: 700,
+                      fontSize: '1.05rem',
+                      color: balance > 0 ? '#dc2626' : balance < 0 ? '#059669' : '#6b7280'
                     }}>
                       {balance > 0 ? `₹${balance.toFixed(2)}` : balance < 0 ? `-₹${Math.abs(balance).toFixed(2)}` : '₹0.00'}
                     </td>
-                    <td style={{ padding: '8px', textAlign: 'center' }}>
+                    <td style={{ padding: '12px', textAlign: 'center', fontSize: '0.9rem' }}>
                       {isOrganizer ? (
-                        <b>Collects from others</b>
+                        <span style={{ 
+                          fontWeight: '700',
+                          color: '#78350f',
+                          backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                          padding: '6px 12px',
+                          borderRadius: '6px'
+                        }}>
+                          💰 Collects from others
+                        </span>
                       ) : balance > 0 ? (
-                        <span style={{ color: '#d32f2f' }}>Pay ₹{balance.toFixed(2)} to {organizer}</span>
+                        <span style={{ 
+                          color: '#dc2626',
+                          fontWeight: '600',
+                          backgroundColor: '#fee2e2',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          display: 'inline-block'
+                        }}>
+                          📤 Pay ₹{balance.toFixed(2)} to {organizer}
+                        </span>
                       ) : balance < 0 ? (
-                        <span style={{ color: '#388e3c' }}>Receive ₹{Math.abs(balance).toFixed(2)} from {organizer}</span>
+                        <span style={{ 
+                          color: '#059669',
+                          fontWeight: '600',
+                          backgroundColor: '#d1fae5',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          display: 'inline-block'
+                        }}>
+                          📥 Receive ₹{Math.abs(balance).toFixed(2)} from {organizer}
+                        </span>
                       ) : (
-                        <span style={{ color: '#666' }}>Settled</span>
+                        <span style={{ 
+                          color: '#6b7280',
+                          fontWeight: '600',
+                          backgroundColor: '#f3f4f6',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          display: 'inline-block'
+                        }}>
+                          ✅ Settled
+                        </span>
                       )}
                     </td>
                   </tr>
@@ -328,9 +603,24 @@ export default function PreviewStep() {
             </tbody>
           </table>
         </div>
-        <p className="small" style={{ marginTop: 8, color: '#666' }}>
-          <em>Note: Positive balance means the person owes money to the organizer. Negative balance means the person paid more than their share.</em>
-        </p>
+        <div style={{ 
+          marginTop: '16px',
+          padding: '12px',
+          backgroundColor: '#eff6ff',
+          borderRadius: '8px',
+          border: '1px solid #bfdbfe',
+          color: '#1e40af',
+          fontSize: '0.9rem',
+          fontStyle: 'italic',
+          display: 'flex',
+          alignItems: 'start',
+          gap: '8px'
+        }}>
+          <span style={{ fontSize: '1.2rem' }}>💡</span>
+          <span>
+            <strong>Note:</strong> Positive balance means the person owes money to the organizer. Negative balance means the person paid more than their share.
+          </span>
+        </div>
       </div>
 
       {snackbar && (
