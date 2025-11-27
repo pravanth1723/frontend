@@ -48,7 +48,7 @@ export default function RoomsPage() {
         </div>
 
         <div className="col">
-          <RoomsList rooms={apiRooms} />
+          <RoomsList rooms={apiRooms} onRoomsChange={fetchRooms} />
         </div>
       </div>
 
