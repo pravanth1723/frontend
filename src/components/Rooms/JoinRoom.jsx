@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Snackbar from "../Snackbar";
 import Spinner from "../Spinner";
+import { BACKEND_URL } from "../../config";
 
 /**
  * JoinRoom Component
@@ -24,7 +25,7 @@ export default function JoinRoom() {
     }
 
     setIsLoading(true);
-    axios.post(`http://localhost:5000/api/rooms/join/${encodeURIComponent(joinRoomCode)}`, 
+    axios.post(`${BACKEND_URL}/api/rooms/join/${encodeURIComponent(joinRoomCode)}`, 
       { joinRoomCode: joinRoomCode, passcode: passcode.trim() },
       { withCredentials: true }
     )

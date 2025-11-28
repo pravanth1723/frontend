@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Snackbar from "../Snackbar";
 import Spinner from "../Spinner";
+import { BACKEND_URL } from "../../config";
 
 /**
  * CreateRoom Component
@@ -16,7 +17,7 @@ export default function CreateRoom({ onRoomCreated }) {
   function createRoom(kind) {
     const roomCode = roomIdInput.trim() || `room-${Date.now()}`;
     setIsLoading(true);
-    axios.post('http://localhost:5000/api/rooms', { roomCode, passcode, kind }, { withCredentials: true })
+    axios.post(`${BACKEND_URL}/api/rooms`, { roomCode, passcode, kind }, { withCredentials: true })
       .then(response => {
         setIsLoading(false);
         if (response.status === 200) {

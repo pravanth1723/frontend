@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Snackbar from "../Snackbar";
 import Spinner from "../Spinner";
+import { BACKEND_URL } from "../../config";
 
 /**
  * Setup Component
@@ -35,7 +36,7 @@ export default function Setup() {
 
   function fetchRoomMeta() {
     setIsLoading(true);
-    axios.get(`http://localhost:5000/api/rooms/${roomId}`, { withCredentials: true })
+    axios.get(`${BACKEND_URL}/api/rooms/${roomId}`, { withCredentials: true })
       .then(response => {
         if (response.status === 200) {
           const data = response.data.data;
@@ -86,7 +87,7 @@ export default function Setup() {
     }
 
     setIsSaving(true);
-    axios.put(`http://localhost:5000/api/rooms/${roomId}`, {
+    axios.put(`${BACKEND_URL}/api/rooms/${roomId}`, {
       title: trimmedTitle,
       members: membersArray,
       organizer: trimmedOrganizer,

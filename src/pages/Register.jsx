@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { store } from '../App';
 import Snackbar from '../components/Snackbar';
 import Spinner from '../components/Spinner';
+import { BACKEND_URL } from "../config";
 
 /**
  * Register page
@@ -31,7 +32,7 @@ export default function Register() {
     }
 
     setIsLoading(true);
-    axios.post('http://localhost:5000/api/users/register', { 
+    axios.post(`${BACKEND_URL}/api/users/register`, { 
       username, 
       password
     }, { withCredentials: true })

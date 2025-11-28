@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { store } from '../App';
 import Snackbar from '../components/Snackbar';
 import Spinner from '../components/Spinner';
+import { BACKEND_URL } from "../config";
 
 /**
  * Login page - uses localStorage 'users' for demo credentials.
@@ -19,7 +20,7 @@ export default function Login() {
   function handleSubmit(e) {
     e.preventDefault();
     setIsLoading(true);
-    axios.post('http://localhost:5000/api/users/login', { username, password }, { withCredentials: true })
+    axios.post(`${BACKEND_URL}/api/users/login`, { username, password }, { withCredentials: true })
       .then(response => {
         console.log("Response", response);
         setSnackbar({ category: response.data.category, message: response.data.message });

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Snackbar from "../Snackbar";
 import Spinner from "../Spinner";
+import { BACKEND_URL } from "../../config";
 
 /**
  * RoomsList Component
@@ -49,7 +50,7 @@ export default function RoomsList({ rooms, onRoomsChange }) {
     setIsLoading(true);
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/rooms/change-passcode/${showPasscodeModal._id}`,
+        `${BACKEND_URL}/api/rooms/change-passcode/${showPasscodeModal._id}`,
         { passcode: newPasscode },
         { withCredentials: true }
       );
@@ -78,7 +79,7 @@ export default function RoomsList({ rooms, onRoomsChange }) {
     setIsLoading(true);
     try {
       const response = await axios.delete(
-        `http://localhost:5000/api/rooms/${room._id}`,
+        `${BACKEND_URL}/api/rooms/${room._id}`,
         { withCredentials: true }
       );
 
@@ -105,7 +106,7 @@ export default function RoomsList({ rooms, onRoomsChange }) {
     setIsLoading(true);
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/rooms/exit/${room._id}`,
+        `${BACKEND_URL}/api/rooms/exit/${room._id}`,
         {},
         { withCredentials: true }
       );

@@ -4,6 +4,7 @@ import axios from "axios";
 import EditExpenseModal from "../EditExpenseModal";
 import Snackbar from "../Snackbar";
 import Spinner from "../Spinner";
+import { BACKEND_URL } from "../../config";
 
 /**
  * Expenses Component
@@ -41,7 +42,7 @@ export default function Expenses() {
 
   async function fetchRoomData() {
     try {
-      const response = await axios.get(`http://localhost:5000/api/rooms/${roomId}`, { withCredentials: true });
+      const response = await axios.get(`${BACKEND_URL}/api/rooms/${roomId}`, { withCredentials: true });
       if (response.status === 200) {
         const data = response.data.data;
         setRoomTitle(data.title || data.name || "");
@@ -58,7 +59,7 @@ export default function Expenses() {
 
   async function fetchExpenses() {
     try {
-      const response = await axios.get(`http://localhost:5000/api/expenses/by-room-id/${roomId}`, { withCredentials: true });
+      const response = await axios.get(`${BACKEND_URL}/api/expenses/by-room-id/${roomId}`, { withCredentials: true });
       if (response.status === 200) {
         setApiExpenses(response.data.data || []); // Fixed: accessing data.data
       }
@@ -148,7 +149,7 @@ export default function Expenses() {
 
     setIsSaving(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/expenses', expenseData, { withCredentials: true });
+      const response = await axios.post(`${BACKEND_URL}/api/expenses`, expenseData, { withCredentials: true });
       if (response.status === 200 || response.status === 201) {
         setSnackbar({ category: 'success', message: 'Expense added successfully!' });
         setDescription("");
@@ -173,7 +174,7 @@ export default function Expenses() {
     if (!window.confirm("Are you sure you want to delete this expense?")) return;
 
     try {
-      const response = await axios.delete(`http://localhost:5000/api/expenses/${expenseId}`, { withCredentials: true });
+      const response = await axios.delete(`${BACKEND_URL}/api/expenses/${expenseId}`, { withCredentials: true });
       if (response.status === 200) {
         setSnackbar({ category: 'success', message: 'Expense deleted successfully!' });
         fetchExpenses();
@@ -188,7 +189,7 @@ export default function Expenses() {
   async function applyEdit(updatedExpense) {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/expenses/${editingExpense._id}`,
+        `${BACKEND_URL}/api/expenses/${editingExpense._id}`,
         updatedExpense,
         { withCredentials: true }
       );

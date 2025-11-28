@@ -5,7 +5,6 @@ import Setup from "../components/Room/Setup";
 import Expenses from "../components/Room/Expenses";
 import PreviewStep from "../components/Room/Finalize_and_preview"
 
-
 function RoomContent() {
   const { roomId } = useParams();
   const navigate = useNavigate();

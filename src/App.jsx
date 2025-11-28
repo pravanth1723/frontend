@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import RoomPage from "./pages/Room";
 import RoomsPage from "./pages/Rooms";
 import Spinner from "./components/Spinner";
+import { BACKEND_URL } from "./config";
 
 /**
  * App - top-level router with user state management
@@ -26,7 +27,7 @@ export default function App() {
 
   async function checkAuthStatus() {
     try {
-      const response = await axios.get('http://localhost:5000/api/users/me', { 
+      const response = await axios.get(`${BACKEND_URL}/api/users/me`, { 
         withCredentials: true 
       });
       

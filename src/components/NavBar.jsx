@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { store } from "../App";
 import axios from "axios";
+import { BACKEND_URL } from "../config";
 
 export default function NavBar() {
   const [user, setUser] = useContext(store);
@@ -11,7 +12,7 @@ export default function NavBar() {
   async function logout() {
     try {
       // Call backend logout endpoint to clear session
-      await axios.post('http://localhost:5000/api/users/logout', {}, { 
+      await axios.post(`${BACKEND_URL}/api/users/logout`, {}, { 
         withCredentials: true 
       });
     } catch (error) {

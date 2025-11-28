@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Snackbar from "../Snackbar";
 import Spinner from "../Spinner";
+import { BACKEND_URL } from "../../config";
 
 /**
  * Step 3 - Preview
@@ -43,11 +44,11 @@ export default function PreviewStep() {
       setIsLoading(true);
       
       // Fetch room metadata
-      const roomRes = await axios.get(`http://localhost:5000/api/rooms/${roomId}`, { withCredentials: true });
+      const roomRes = await axios.get(`${BACKEND_URL}/api/rooms/${roomId}`, { withCredentials: true });
       setRoomData(roomRes.data.data);
       
       // Fetch expenses for this room
-      const expenseRes = (await axios.get(`http://localhost:5000/api/expenses/by-room-id/${roomId}`, { withCredentials: true })).data;
+      const expenseRes = (await axios.get(`${BACKEND_URL}/api/expenses/by-room-id/${roomId}`, { withCredentials: true })).data;
       
       // Check if expenses array is empty
       if (!expenseRes.data || expenseRes.data.length === 0) {

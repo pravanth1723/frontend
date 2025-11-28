@@ -4,6 +4,7 @@ import CreateRoom from "../components/Rooms/CreateRoom";
 import RoomsList from "../components/Rooms/RoomsList";
 import JoinRoomComponent from "../components/Rooms/JoinRoom";
 import Snackbar from "../components/Snackbar";
+import { BACKEND_URL } from "../config";
 
 /**
  * RoomsPage
@@ -19,7 +20,7 @@ export default function RoomsPage() {
   }, []);
 
   function fetchRooms() {
-    axios.get('http://localhost:5000/api/rooms', { withCredentials: true })
+    axios.get(`${BACKEND_URL}/api/rooms`, { withCredentials: true })
       .then(response => {
         if (response.status === 200) {
           console.log('Rooms fetched from API:', response.data);
