@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { store } from "../App";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
+import './NavBar.css';
 
 export default function NavBar() {
   const [user, setUser] = useContext(store);
@@ -28,121 +29,41 @@ export default function NavBar() {
   const isRegisterPage = location.pathname === '/register';
 
   return (
-    <nav className="nav" style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '1rem 2rem',
-      backgroundColor: 'var(--primary)',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      position: 'sticky',
-      top: 0,
-      zIndex: 1000
-    }}>
+    <nav className="navbar">
       <div className="nav-left">
-        <Link to="/" className="brand" style={{
-          fontSize: '1.5rem',
-          fontWeight: 'bold',
-          color: 'white',
-          textDecoration: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem'
-        }}>
+        <Link to="/" className="nav-brand">
           💰 SplitWise
         </Link>
       </div>
 
-      <div className="nav-right" style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '1rem'
-      }}>
+      <div className="nav-right">
         {user === "loggedin" ? (
           <>
-            <Link to="/rooms" className="nav-link" style={{
-              color: 'white',
-              textDecoration: 'none',
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              transition: 'background-color 0.3s',
-              fontWeight: '500'
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}>
+            <Link 
+              to="/rooms" 
+              className={`nav-item nav-link ${location.pathname.includes('/room') ? 'active' : ''}`}
+            >
               My Rooms
             </Link>
             <button 
-              className="btn" 
+              className="nav-item nav-button" 
               onClick={logout}
-              style={{
-                backgroundColor: 'white',
-                color: 'var(--primary)',
-                border: 'none',
-                padding: '0.5rem 1.5rem',
-                borderRadius: '6px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'transform 0.2s, box-shadow 0.2s'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = 'none';
-              }}
             >
               Logout
             </button>
           </>
         ) : (
           <>
-            <Link to="/login" className="nav-link" style={{
-              backgroundColor: isLoginPage ? 'white' : 'transparent',
-              color: isLoginPage ? 'var(--primary)' : 'white',
-              textDecoration: 'none',
-              padding: '0.5rem 1rem',
-              borderRadius: '6px',
-              transition: 'all 0.3s',
-              fontWeight: '500'
-            }}
-            onMouseEnter={(e) => {
-              if (!isLoginPage) {
-                e.target.style.backgroundColor = 'rgba(255,255,255,0.1)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isLoginPage) {
-                e.target.style.backgroundColor = 'transparent';
-              }
-            }}>
+            <Link 
+              to="/login" 
+              className={`nav-item nav-link ${isLoginPage ? 'active' : ''}`}
+            >
               Login
             </Link>
-            <Link to="/register" style={{
-              backgroundColor: isRegisterPage ? 'white' : 'transparent',
-              color: isRegisterPage ? 'var(--primary)' : 'white',
-              textDecoration: 'none',
-              padding: '0.5rem 1.5rem',
-              borderRadius: '6px',
-              fontWeight: '600',
-              transition: 'all 0.3s',
-              display: 'inline-block',
-              border: isRegisterPage ? 'none' : '2px solid white'
-            }}
-            onMouseEnter={(e) => {
-              if (!isRegisterPage) {
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isRegisterPage) {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = 'none';
-              }
-            }}>
+            <Link 
+              to="/register" 
+              className={`nav-item nav-button ${isRegisterPage ? 'active' : ''}`}
+            >
               Register
             </Link>
           </>
