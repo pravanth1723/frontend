@@ -4,7 +4,9 @@ import axios from "axios";
 import EditExpenseModal from "../EditExpenseModal";
 import Snackbar from "../Snackbar";
 import Spinner from "../Spinner";
+import Calculator from "./Calculator";
 import { BACKEND_URL } from "../../config";
+import './Expenses.css';
 
 /**
  * Expenses Component
@@ -34,6 +36,7 @@ export default function Expenses() {
 
   const [editingExpense, setEditingExpense] = useState(null);
   const [snackbar, setSnackbar] = useState(null);
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
 
   useEffect(() => {
     fetchRoomData();
@@ -209,164 +212,72 @@ export default function Expenses() {
 
   if (isLoading) {
     return (
-      <div style={{ 
-        textAlign: 'center', 
-        padding: '60px 20px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '16px'
-      }}>
+      <div className="expenses-loading">
         <Spinner size="large" />
-        <p style={{ color: '#6b7280', fontSize: '1.1rem' }}>Loading room data...</p>
+        <p className="expenses-loading-text">Loading room data...</p>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-      <div style={{
-        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        color: 'white',
-        borderRadius: '12px',
-        padding: '24px',
-        marginBottom: '24px',
-        boxShadow: '0 8px 20px rgba(245, 87, 108, 0.3)'
-      }}>
-        <h2 style={{ 
-          fontSize: '1.75rem', 
-          marginBottom: '12px',
-          fontWeight: '700',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
-          <span style={{ fontSize: '2rem' }}>💰</span>
-          {roomTitle}
-        </h2>
-        <div style={{ 
-          display: 'flex', 
-          flexWrap: 'wrap', 
-          gap: '8px',
-          opacity: 0.95
-        }}>
-          <span style={{ fontWeight: '600' }}>Members:</span>
+    <div className="expenses-container">
+      <div className="expenses-header">
+        <div className="expenses-header-top">
+          <h2 className="expenses-title">
+            <span className="expenses-title-icon">💰</span>
+            {roomTitle}
+          </h2>
+          <button
+            onClick={() => setIsCalculatorOpen(true)}
+            className="calculator-button"
+          >
+            🧮 Calculator
+          </button>
+        </div>
+        <div className="expenses-members">
+          <span className="expenses-members-label">Members:</span>
           {members.map((member, idx) => (
-            <span key={idx} style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              padding: '4px 10px',
-              borderRadius: '6px',
-              fontSize: '0.9rem'
-            }}>
+            <span key={idx} className="member-badge">
               {member}
             </span>
           ))}
         </div>
       </div>
 
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        padding: '28px',
-        marginBottom: '24px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-        border: '1px solid #e5e7eb'
-      }}>
-        <h3 style={{ 
-          fontSize: '1.5rem', 
-          marginBottom: '24px',
-          color: '#1f2937',
-          fontWeight: '700',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
-          <span style={{ fontSize: '1.8rem' }}>➕</span>
+      <div className="add-expense-card">
+        <h3 className="add-expense-title">
+          <span className="add-expense-icon">➕</span>
           Add New Expense
         </h3>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '8px', 
-              fontWeight: '600',
-              color: '#374151',
-              fontSize: '0.95rem'
-            }}>
-              Description *
-            </label>
+        <div className="form-container">
+          <div className="form-group">
+            <label className="form-label">Description *</label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g., Dinner at restaurant"
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '2px solid #e5e7eb',
-                borderRadius: '8px',
-                fontSize: '1rem',
-                transition: 'border-color 0.3s',
-                boxSizing: 'border-box'
-              }}
-              onFocus={(e) => e.target.style.borderColor = '#f5576c'}
-              onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+              className="form-input"
             />
           </div>
 
-          <div>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '12px', 
-              fontWeight: '600',
-              color: '#374151',
-              fontSize: '0.95rem'
-            }}>
-              Paid By *
-            </label>
-            <div style={{ marginBottom: '12px' }}>
+          <div className="form-group">
+            <label className="form-label required">Paid By *</label>
+            <div className="payers-list">
               {payers.length === 0 && (
-                <div style={{ 
-                  fontStyle: 'italic', 
-                  color: '#9ca3af',
-                  padding: '12px',
-                  backgroundColor: '#f9fafb',
-                  borderRadius: '8px',
-                  textAlign: 'center'
-                }}>
+                <div className="no-payers">
                   No payers added yet
                 </div>
               )}
               {payers.map((payer, idx) => (
-                <div key={idx} style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '12px',
-                  backgroundColor: '#f0fdf4',
-                  borderRadius: '8px',
-                  marginBottom: '8px',
-                  border: '1px solid #bbf7d0'
-                }}>
-                  <span style={{ fontWeight: '500', color: '#166534' }}>
+                <div key={idx} className="payer-item">
+                  <span className="payer-info">
                     {payer.name}: <b>₹{parseFloat(payer.amount).toFixed(2)}</b>
                   </span>
                   <button
                     onClick={() => removePayer(idx)}
-                    style={{
-                      backgroundColor: '#fee2e2',
-                      color: '#991b1b',
-                      border: 'none',
-                      padding: '6px 12px',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontWeight: '600',
-                      fontSize: '0.85rem',
-                      transition: 'background-color 0.3s'
-                    }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#fecaca'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#fee2e2'}
+                    className="remove-payer-btn"
                   >
                     Remove
                   </button>
@@ -374,19 +285,11 @@ export default function Expenses() {
               ))}
             </div>
 
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div className="add-payer-form">
               <select
                 value={newPayerName}
                 onChange={(e) => setNewPayerName(e.target.value)}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '1rem',
-                  backgroundColor: 'white',
-                  cursor: 'pointer'
-                }}
+                className="payer-select"
               >
                 <option value="">Select person</option>
                 {members.map(member => (
@@ -398,97 +301,34 @@ export default function Expenses() {
                 value={newPayerAmount}
                 onChange={(e) => setNewPayerAmount(e.target.value)}
                 placeholder="Amount"
-                style={{
-                  width: '150px',
-                  padding: '12px',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '1rem'
-                }}
+                className="amount-input"
               />
               <button
                 onClick={addPayer}
-                style={{
-                  padding: '12px 20px',
-                  backgroundColor: '#10b981',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s',
-                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.4)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = '0 2px 8px rgba(16, 185, 129, 0.3)';
-                }}
+                className="add-payer-btn"
               >
                 Add
               </button>
             </div>
             {payers.length > 0 && (
-              <div style={{ 
-                marginTop: '12px', 
-                fontWeight: '700',
-                color: '#1f2937',
-                fontSize: '1.05rem',
-                padding: '10px',
-                backgroundColor: '#f0fdf4',
-                borderRadius: '6px',
-                textAlign: 'center'
-              }}>
+              <div className="total-paid">
                 Total Paid: ₹{totalPaid.toFixed(2)}
               </div>
             )}
           </div>
 
-          <div>
-            <label style={{ 
-              display: 'block', 
-              marginBottom: '12px', 
-              fontWeight: '600',
-              color: '#374151',
-              fontSize: '0.95rem'
-            }}>
-              Who Shares? *
-            </label>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', 
-              gap: '10px' 
-            }}>
+          <div className="form-group">
+            <label className="form-label required">Who Shares? *</label>
+            <div className="members-grid">
               {members.map(member => (
-                <label key={member} style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '12px',
-                  backgroundColor: selectedMembers.includes(member) ? '#dbeafe' : '#f9fafb',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  border: `2px solid ${selectedMembers.includes(member) ? '#3b82f6' : '#e5e7eb'}`,
-                  transition: 'all 0.3s',
-                  fontWeight: '500'
-                }}
-                onMouseEnter={(e) => {
-                  if (!selectedMembers.includes(member)) {
-                    e.currentTarget.style.backgroundColor = '#f3f4f6';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!selectedMembers.includes(member)) {
-                    e.currentTarget.style.backgroundColor = '#f9fafb';
-                  }
-                }}>
+                <label 
+                  key={member} 
+                  className={`member-checkbox ${selectedMembers.includes(member) ? 'selected' : ''}`}
+                >
                   <input
                     type="checkbox"
                     checked={selectedMembers.includes(member)}
                     onChange={() => toggleMember(member)}
-                    style={{ marginRight: '8px', cursor: 'pointer' }}
                   />
                   {member}
                 </label>
@@ -497,96 +337,43 @@ export default function Expenses() {
           </div>
 
           {selectedMembers.length > 0 && (
-            <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '12px', 
-                fontWeight: '600',
-                color: '#374151',
-                fontSize: '0.95rem'
-              }}>
-                Split Type
-              </label>
-              <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-                <label style={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  padding: '12px 16px',
-                  backgroundColor: splitType === 'equal' ? '#dbeafe' : '#f9fafb',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  border: `2px solid ${splitType === 'equal' ? '#3b82f6' : '#e5e7eb'}`,
-                  flex: 1,
-                  transition: 'all 0.3s'
-                }}>
+            <div className="form-group">
+              <label className="form-label">Split Type</label>
+              <div className="split-type-container">
+                <label className={`split-type-option ${splitType === 'equal' ? 'selected' : ''}`}>
                   <input
                     type="radio"
                     value="equal"
                     checked={splitType === "equal"}
                     onChange={(e) => setSplitType(e.target.value)}
-                    style={{ marginRight: '8px', cursor: 'pointer' }}
                   />
-                  <span style={{ fontWeight: '500' }}>Split Equally</span>
+                  <span>Split Equally</span>
                 </label>
-                <label style={{ 
-                  display: 'flex', 
-                  alignItems: 'center',
-                  padding: '12px 16px',
-                  backgroundColor: splitType === 'individual' ? '#dbeafe' : '#f9fafb',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  border: `2px solid ${splitType === 'individual' ? '#3b82f6' : '#e5e7eb'}`,
-                  flex: 1,
-                  transition: 'all 0.3s'
-                }}>
+                <label className={`split-type-option ${splitType === 'individual' ? 'selected' : ''}`}>
                   <input
                     type="radio"
                     value="individual"
                     checked={splitType === "individual"}
                     onChange={(e) => setSplitType(e.target.value)}
-                    style={{ marginRight: '8px', cursor: 'pointer' }}
                   />
-                  <span style={{ fontWeight: '500' }}>Individual Amounts</span>
+                  <span>Individual Amounts</span>
                 </label>
               </div>
 
               {splitType === "equal" ? (
-                <div style={{
-                  padding: '16px',
-                  backgroundColor: '#f0fdf4',
-                  borderRadius: '8px',
-                  textAlign: 'center',
-                  border: '1px solid #bbf7d0'
-                }}>
-                  <span style={{ fontWeight: '600', color: '#166534', fontSize: '1.05rem' }}>
+                <div className="equal-split-display">
+                  <span className="equal-split-text">
                     Each person pays: ₹{(totalPaid / selectedMembers.length).toFixed(2)}
                   </span>
                 </div>
               ) : (
                 <div>
-                  <div style={{ 
-                    fontSize: '0.9rem', 
-                    color: '#6b7280',
-                    marginBottom: '12px',
-                    padding: '10px',
-                    backgroundColor: '#fef3c7',
-                    borderRadius: '6px',
-                    textAlign: 'center'
-                  }}>
+                  <div className="individual-amounts-warning">
                     ⚠️ Enter individual amounts (must total ₹{totalPaid.toFixed(2)})
                   </div>
                   {selectedMembers.map(member => (
-                    <div key={member} style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      marginBottom: '10px',
-                      gap: '12px'
-                    }}>
-                      <label style={{ 
-                        flex: 1, 
-                        fontWeight: '500',
-                        color: '#374151'
-                      }}>
+                    <div key={member} className="individual-amount-row">
+                      <label className="individual-amount-label">
                         {member}:
                       </label>
                       <input
@@ -594,25 +381,11 @@ export default function Expenses() {
                         placeholder="Amount"
                         value={individualAmounts[member] || ''}
                         onChange={(e) => handleIndividualAmountChange(member, e.target.value)}
-                        style={{
-                          width: '150px',
-                          padding: '10px',
-                          border: '2px solid #e5e7eb',
-                          borderRadius: '8px',
-                          fontSize: '1rem'
-                        }}
+                        className="individual-amount-input"
                       />
                     </div>
                   ))}
-                  <div style={{
-                    marginTop: '12px',
-                    padding: '12px',
-                    backgroundColor: '#f0fdf4',
-                    borderRadius: '8px',
-                    textAlign: 'center',
-                    fontWeight: '700',
-                    color: '#166534'
-                  }}>
+                  <div className="individual-total">
                     Total Individual: ₹{selectedMembers.reduce((sum, member) => sum + (parseFloat(individualAmounts[member]) || 0), 0).toFixed(2)}
                   </div>
                 </div>
@@ -623,35 +396,7 @@ export default function Expenses() {
           <button
             onClick={submitExpense}
             disabled={isSaving}
-            style={{
-              width: '100%',
-              padding: '14px 24px',
-              backgroundColor: '#f5576c',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: '700',
-              fontSize: '1.05rem',
-              cursor: isSaving ? 'not-allowed' : 'pointer',
-              transition: 'all 0.3s',
-              opacity: isSaving ? 0.7 : 1,
-              boxShadow: '0 4px 12px rgba(245, 87, 108, 0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px',
-              marginTop: '8px'
-            }}
-            onMouseEnter={(e) => {
-              if (!isSaving) {
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = '0 6px 16px rgba(245, 87, 108, 0.4)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 4px 12px rgba(245, 87, 108, 0.3)';
-            }}
+            className="submit-expense-btn"
           >
             {isSaving && <Spinner size="small" color="#ffffff" />}
             <span>{isSaving ? 'Adding...' : '➕ Add Expense'}</span>
@@ -659,192 +404,73 @@ export default function Expenses() {
         </div>
       </div>
 
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        padding: '28px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-        border: '1px solid #e5e7eb'
-      }}>
+      <div className="expenses-list-card">
         <div
           onClick={() => setIsExpensesOpen(!isExpensesOpen)}
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            cursor: 'pointer',
-            padding: '12px',
-            backgroundColor: '#f9fafb',
-            borderRadius: '8px',
-            transition: 'background-color 0.3s'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f9fafb'}
+          className="expenses-list-header"
         >
-          <h3 style={{
-            fontSize: '1.5rem',
-            color: '#1f2937',
-            fontWeight: '700',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            margin: 0
-          }}>
-            <span style={{ fontSize: '1.8rem' }}>📋</span>
+          <h3 className="expenses-list-title">
+            <span className="expenses-list-icon">📋</span>
             Added Expenses ({apiExpenses.length})
           </h3>
-          <span style={{
-            fontSize: '1.5rem',
-            transform: isExpensesOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 0.3s',
-            color: '#6b7280'
-          }}>
+          <span className={`expenses-dropdown-icon ${isExpensesOpen ? 'open' : ''}`}>
             ▼
           </span>
         </div>
 
         {isExpensesOpen && (
-          <div style={{ marginTop: '20px' }}>
+          <div className="expenses-list-content">
             {apiExpenses.length === 0 ? (
-              <div style={{
-                textAlign: 'center',
-                padding: '40px 20px',
-                color: '#9ca3af',
-                fontStyle: 'italic'
-              }}>
+              <div className="no-expenses">
                 No expenses added yet
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="expenses-grid">
                 {apiExpenses.map((expense) => (
-                  <div
-                    key={expense._id}
-                    style={{
-                      padding: '20px',
-                      backgroundColor: '#f9fafb',
-                      borderRadius: '10px',
-                      border: '1px solid #e5e7eb',
-                      transition: 'all 0.3s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
-                      e.currentTarget.style.borderColor = '#d1d5db';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = 'none';
-                      e.currentTarget.style.borderColor = '#e5e7eb';
-                    }}
-                  >
-                    <div style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between', 
-                      alignItems: 'flex-start',
-                      marginBottom: '12px'
-                    }}>
+                  <div key={expense._id} className="expense-item">
+                    <div className="expense-header">
                       <div>
-                        <h4 style={{ 
-                          margin: '0 0 8px 0', 
-                          fontSize: '1.2rem',
-                          color: '#1f2937',
-                          fontWeight: '600'
-                        }}>
+                        <h4 className="expense-title">
                           {expense.description}
                         </h4>
-                        <div style={{ 
-                          fontSize: '1.1rem', 
-                          fontWeight: '700',
-                          color: '#059669'
-                        }}>
+                        <div className="expense-total">
                           Total: ₹{parseFloat(expense.total).toFixed(2)}
                         </div>
                       </div>
-                      <div style={{ display: 'flex', gap: '8px' }}>
+                      <div className="expense-actions">
                         <button
                           onClick={() => setEditingExpense(expense)}
-                          style={{
-                            padding: '8px 16px',
-                            backgroundColor: '#3b82f6',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            fontWeight: '600',
-                            fontSize: '0.9rem',
-                            transition: 'background-color 0.3s'
-                          }}
-                          onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-                          onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                          className="edit-expense-btn"
                         >
                           ✏️ Edit
                         </button>
                         <button
                           onClick={() => handleDeleteExpense(expense._id)}
-                          style={{
-                            padding: '8px 16px',
-                            backgroundColor: '#ef4444',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            fontWeight: '600',
-                            fontSize: '0.9rem',
-                            transition: 'background-color 0.3s'
-                          }}
-                          onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
-                          onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
+                          className="delete-expense-btn"
                         >
                           🗑️ Delete
                         </button>
                       </div>
                     </div>
 
-                    <div style={{ 
-                      display: 'grid', 
-                      gridTemplateColumns: '1fr 1fr', 
-                      gap: '12px',
-                      marginTop: '16px',
-                      paddingTop: '16px',
-                      borderTop: '1px solid #e5e7eb'
-                    }}>
+                    <div className="expense-details">
                       <div>
-                        <div style={{ 
-                          fontSize: '0.85rem', 
-                          color: '#6b7280',
-                          fontWeight: '600',
-                          marginBottom: '8px',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px'
-                        }}>
+                        <div className="expense-section-title">
                           💳 Paid By
                         </div>
                         {expense.spentBy.map((s, idx) => (
-                          <div key={idx} style={{ 
-                            fontSize: '0.95rem',
-                            color: '#374151',
-                            padding: '4px 0'
-                          }}>
+                          <div key={idx} className="expense-detail-item">
                             {s.name}: <b>₹{parseFloat(s.amount).toFixed(2)}</b>
                           </div>
                         ))}
                       </div>
 
                       <div>
-                        <div style={{ 
-                          fontSize: '0.85rem', 
-                          color: '#6b7280',
-                          fontWeight: '600',
-                          marginBottom: '8px',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px'
-                        }}>
+                        <div className="expense-section-title">
                           👥 Split Among
                         </div>
                         {expense.spentFor.map((s, idx) => (
-                          <div key={idx} style={{ 
-                            fontSize: '0.95rem',
-                            color: '#374151',
-                            padding: '4px 0'
-                          }}>
+                          <div key={idx} className="expense-detail-item">
                             {s.name}: <b>₹{parseFloat(s.amount).toFixed(2)}</b>
                           </div>
                         ))}
@@ -857,40 +483,22 @@ export default function Expenses() {
           </div>
         )}
 
-        <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '2px solid #f3f4f6' }}>
+        <div className="next-step-container">
           <button
             onClick={() => navigate(`/room/${roomId}/step3`)}
-            style={{
-              width: '100%',
-              padding: '14px 24px',
-              backgroundColor: '#10b981',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: '700',
-              fontSize: '1.05rem',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-2px)';
-              e.target.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.4)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
-            }}
+            className="next-step-btn"
           >
             <span>Next: Finalize & Preview</span>
-            <span style={{ fontSize: '1.2rem' }}>→</span>
+            <span className="next-step-arrow">→</span>
           </button>
         </div>
       </div>
+
+      {/* Calculator Component */}
+      <Calculator 
+        isOpen={isCalculatorOpen}
+        onClose={() => setIsCalculatorOpen(false)}
+      />
 
       {editingExpense && (
         <EditExpenseModal
