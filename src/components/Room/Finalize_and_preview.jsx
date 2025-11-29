@@ -16,6 +16,7 @@ export default function PreviewStep() {
   const [roomData, setRoomData] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCalculatingOrganizer, setIsCalculatingOrganizer] = useState(false);
   const [snackbar, setSnackbar] = useState(null);
 
   function downloadPDF() {
@@ -33,6 +34,55 @@ export default function PreviewStep() {
     setTimeout(() => {
       document.title = originalTitle;
     }, 100);
+  }
+
+  async function calculateBestOrganizer() {
+    setIsCalculatingOrganizer(true);
+    try {
+      // Call the calculate best organizer API
+      const response = await axios.get(`${BACKEND_URL}/api/rooms/cal-best-organizer/${roomId}`, { 
+        withCredentials: true 
+      });
+      
+      if (response.status === 200) {
+        const bestOrganizer = response.data.data.bestOrganizer;
+        const currentOrganizer = roomData.organizer;
+        
+        // Show confirmation dialog
+        const confirmMessage = `The system recommends "${bestOrganizer}" as the best organizer.${currentOrganizer !== bestOrganizer ? `\n\nThis will change the organizer from "${currentOrganizer}" to "${bestOrganizer}".` : '\n\nThis is the same as the current organizer.'}\n\nDo you want to proceed with this change?`;
+        
+        const isConfirmed = window.confirm(confirmMessage);
+        
+        if (isConfirmed) {
+          // Call PUT API to update the organizer
+          const updateResponse = await axios.put(`${BACKEND_URL}/api/rooms/${roomId}`, {
+            ...roomData,
+            organizer: bestOrganizer
+          }, { withCredentials: true });
+          
+          if (updateResponse.status === 200) {
+            setSnackbar({ 
+              category: 'success', 
+              message: `Organizer updated to "${bestOrganizer}" successfully!` 
+            });
+            
+            // Refresh the data to get updated calculations
+            await fetchData();
+          }
+        } else {
+          setSnackbar({ 
+            category: 'info', 
+            message: 'Organizer change cancelled by user.' 
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error calculating best organizer:', error);
+      const errorMsg = error.response?.data?.message || 'Failed to calculate best organizer';
+      setSnackbar({ category: 'error', message: errorMsg });
+    } finally {
+      setIsCalculatingOrganizer(false);
+    }
   }
 
   useEffect(() => {
@@ -210,36 +260,85 @@ export default function PreviewStep() {
               </div>
             </div>
           </div>
-          <button 
-            onClick={downloadPDF}
-            style={{
-              backgroundColor: 'white',
-              color: '#667eea',
-              border: 'none',
-              padding: '12px 24px',
-              borderRadius: '8px',
-              fontWeight: '600',
-              fontSize: '1rem',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              whiteSpace: 'nowrap'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-2px)';
-              e.target.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.15)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
-            }}
-          >
-            <span style={{ fontSize: '1.2rem' }}>📥</span>
-            Download PDF
-          </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'stretch', minWidth: '200px' }}>
+            <button
+              onClick={calculateBestOrganizer}
+              disabled={isCalculatingOrganizer}
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+                padding: '10px 16px',
+                borderRadius: '8px',
+                fontWeight: '600',
+                fontSize: '0.9rem',
+                cursor: isCalculatingOrganizer ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                opacity: isCalculatingOrganizer ? 0.7 : 1,
+                whiteSpace: 'nowrap'
+              }}
+              onMouseEnter={(e) => {
+                if (!isCalculatingOrganizer) {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                  e.target.style.transform = 'translateY(-1px)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isCalculatingOrganizer) {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                  e.target.style.transform = 'translateY(0)';
+                }
+              }}
+            >
+              {isCalculatingOrganizer ? (
+                <>
+                  <Spinner size="small" color="#ffffff" />
+                  <span>Calculating...</span>
+                </>
+              ) : (
+                <>
+                  <span style={{ fontSize: '1rem' }}>🎯</span>
+                  <span>Calculate Best Organizer</span>
+                </>
+              )}
+            </button>
+            
+            <button 
+              onClick={downloadPDF}
+              style={{
+                backgroundColor: 'white',
+                color: '#667eea',
+                border: 'none',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                fontWeight: '600',
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                whiteSpace: 'nowrap'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+              }}
+            >
+              <span style={{ fontSize: '1rem' }}>📥</span>
+              <span>Download PDF</span>
+            </button>
+          </div>
         </div>
       </div>
 
