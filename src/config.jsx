@@ -1,2 +1,2 @@
 
-export const BACKEND_URL = "http://localhost:5000"; // Replace with your actual backend URL
+export const BACKEND_URL = "https://backend-8d9y.onrender.com"; // Replace with your actual backend URL
