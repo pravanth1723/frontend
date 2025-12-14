@@ -86,6 +86,54 @@ export default function PreviewStep() {
     }
   }
 
+  function handleUPIPayment(amount, organizerName, payerName) {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (!isMobile) {
+      setSnackbar({ 
+        category: 'error', 
+        message: 'UPI payments are only available on mobile devices' 
+      });
+      return;
+    }
+
+    // Get organizer's UPI ID from room data
+    const organizerUpiId = roomData?.organizerUpiId;
+
+    // Check if UPI ID is configured
+    if (!organizerUpiId) {
+      setSnackbar({ 
+        category: 'error', 
+        message: 'Organizer UPI ID not configured. Please ask the organizer to add their UPI ID in room setup.' 
+      });
+      return;
+    }
+
+    // Format amount to 2 decimal places
+    const formattedAmount = amount.toFixed(2);
+    
+    // Create transaction note
+    const transactionNote = `Payment from ${payerName} to ${organizerName} - ${roomData?.title || 'Room Expense'}`;
+    
+    try {
+      // Generic UPI (shows all UPI apps)
+      const upiUrl = `upi://pay?pa=${organizerUpiId}&pn=${encodeURIComponent(organizerName)}&am=${formattedAmount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+      window.location.href = upiUrl;
+      
+      // Show success message
+      setSnackbar({ 
+        category: 'success', 
+        message: `UPI payment initiated for ₹${formattedAmount} to ${organizerName}` 
+      });
+    } catch (error) {
+      console.error('Error opening UPI app:', error);
+      setSnackbar({ 
+        category: 'error', 
+        message: 'Failed to open UPI app. Please try again.' 
+      });
+    }
+  }
+
   useEffect(() => {
     fetchData();
   }, [roomId]);
@@ -531,16 +579,17 @@ export default function PreviewStep() {
                           💰 Collects from others
                         </span>
                       ) : balance > 0 ? (
-                        <span style={{ 
-                          color: '#dc2626',
-                          fontWeight: '600',
-                          backgroundColor: '#fee2e2',
-                          padding: '6px 12px',
-                          borderRadius: '6px',
-                          display: 'inline-block'
-                        }}>
-                          📤 Pay ₹{balance.toFixed(2)} to {organizer}
-                        </span>
+                        <div className="payment-action-container">
+                          <span className="owes-amount-label">
+                            📤 Owes ₹{balance.toFixed(2)}
+                          </span>
+                          <button
+                            onClick={() => handleUPIPayment(balance, organizer, m)}
+                            className="upi-payment-btn"
+                          >
+                            💳 Pay via UPI
+                          </button>
+                        </div>
                       ) : balance < 0 ? (
                         <span style={{ 
                           color: '#059669',
@@ -550,7 +599,7 @@ export default function PreviewStep() {
                           borderRadius: '6px',
                           display: 'inline-block'
                         }}>
-                          📥 Receive ₹{Math.abs(balance).toFixed(2)} from {organizer}
+                          📥 Receive ₹{Math.abs(balance).toFixed(2)}
                         </span>
                       ) : (
                         <span style={{ 

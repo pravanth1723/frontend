@@ -416,6 +416,50 @@
   text-align: center;
 }
 
+/* UPI Payment Button */
+.upi-payment-btn {
+  background-color: #059669;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 100px;
+  justify-content: center;
+}
+
+.upi-payment-btn:hover {
+  background-color: #047857;
+  transform: translateY(-1px);
+}
+
+.upi-payment-btn:active {
+  transform: translateY(0);
+}
+
+.payment-action-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.owes-amount-label {
+  color: #dc2626;
+  font-weight: 600;
+  background-color: #fee2e2;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  font-size: 0.8rem;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
   /* Header adjustments */
@@ -509,6 +553,22 @@
     font-size: 0.8rem;
   }
 
+  /* UPI Payment responsive */
+  .upi-payment-btn {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+    min-width: 80px;
+  }
+
+  .owes-amount-label {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+  }
+
+  .payment-action-container {
+    gap: 6px;
+  }
+
   /* Loading and error states */
   .loading-container,
   .error-container {
@@ -594,6 +654,23 @@
   .settlement-header th {
     padding: 6px 4px;
     font-size: 0.75rem;
+  }
+
+  /* UPI Payment extra small mobile */
+  .upi-payment-btn {
+    font-size: 0.65rem;
+    padding: 3px 6px;
+    min-width: 70px;
+    gap: 2px;
+  }
+
+  .owes-amount-label {
+    font-size: 0.65rem;
+    padding: 1px 4px;
+  }
+
+  .payment-action-container {
+    gap: 4px;
   }
 
   /* Buttons */
