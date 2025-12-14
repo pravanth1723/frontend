@@ -1,0 +1,623 @@
+/* Loading states */
+.loading-container {
+  background-color: white;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading-text {
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.error-container {
+  background-color: white;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.error-text {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+/* Header Section */
+.header-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  margin-bottom: 20px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 20px;
+}
+
+.header-info {
+  flex: 1;
+}
+
+.header-title {
+  font-size: 1.75rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-icon {
+  font-size: 2rem;
+}
+
+.room-info-card {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.room-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.room-details {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  font-weight: 600;
+}
+
+.room-notes {
+  margin-top: 8px;
+  font-style: italic;
+  opacity: 0.85;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+  min-width: 200px;
+}
+
+.calculate-organizer-btn {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.calculate-organizer-btn:not(.calculating):hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.calculate-organizer-btn.calculating {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.download-pdf-btn {
+  background-color: white;
+  color: #667eea;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.download-pdf-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.button-icon {
+  font-size: 1rem;
+}
+
+/* Table Container */
+.table-container {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.table-title {
+  font-size: 1.3rem;
+  margin-bottom: 16px;
+  color: #1f2937;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.table-icon {
+  font-size: 1.5rem;
+}
+
+/* Scroll wrapper */
+.table-scroll {
+  overflow-x: auto;
+}
+
+/* No expenses message */
+.no-expenses {
+  color: #9ca3af;
+  padding: 40px;
+  text-align: center;
+  background-color: #f9fafb;
+  border-radius: 8px;
+}
+
+.no-expenses-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+/* All Expenses Table */
+.expenses-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.expenses-table-header {
+  border-bottom: 2px solid #e5e7eb;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.expenses-table-header th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.expenses-table-header th:first-child {
+  border-radius: 8px 0 0 0;
+}
+
+.expenses-table-header th:last-child {
+  border-radius: 0 8px 0 0;
+}
+
+.amount-header {
+  text-align: right !important;
+}
+
+.expenses-table-row {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.2s;
+}
+
+.expenses-table-row:hover {
+  background-color: #f9fafb;
+}
+
+.expenses-table-cell {
+  padding: 12px;
+  vertical-align: top;
+}
+
+.number-cell {
+  font-weight: 600;
+  color: #667eea;
+  width: 40px;
+}
+
+.amount-cell {
+  text-align: right;
+  font-weight: 700;
+  color: #059669;
+  white-space: nowrap;
+}
+
+.split-item {
+  margin-bottom: 2px;
+  font-size: 0.9rem;
+}
+
+.person-name {
+  font-weight: 500;
+}
+
+.expenses-table-footer {
+  border-top: 2px solid #e5e7eb;
+  background-color: #f9fafb;
+  font-weight: bold;
+}
+
+.total-amount {
+  text-align: right;
+  font-size: 1.2rem;
+  color: #059669;
+}
+
+/* Member Cards for Individual Breakdown */
+.member-card {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 10px;
+  border: 2px solid #fbbf24;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.2);
+}
+
+.member-header {
+  font-weight: 700;
+  margin-bottom: 12px;
+  font-size: 1.1rem;
+  color: #92400e;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.member-icon {
+  flex-shrink: 0;
+}
+
+.organizer-badge {
+  font-size: 0.75rem;
+  color: #78350f;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.no-expenses-member {
+  color: #92400e;
+  font-style: italic;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.expenses-table-container {
+  background-color: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  padding: 12px;
+  overflow-x: auto;
+}
+
+.table-header {
+  border-bottom: 2px solid #fbbf24;
+}
+
+.table-cell-left {
+  padding: 8px;
+  text-align: left;
+  color: #92400e;
+}
+
+.table-cell-right {
+  padding: 8px;
+  text-align: right;
+  color: #92400e;
+}
+
+.table-row {
+  border-bottom: 1px solid #fde68a;
+}
+
+.table-cell-index {
+  padding: 8px;
+  font-weight: 600;
+  color: #78350f;
+}
+
+.table-cell-amount {
+  padding: 8px;
+  text-align: right;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.table-footer {
+  border-top: 2px solid #fbbf24;
+  font-weight: bold;
+}
+
+.table-cell-total {
+  padding: 8px;
+  text-align: right;
+  font-size: 1.05rem;
+  color: #78350f;
+}
+
+/* Settlement Table */
+.settlement-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+.settlement-header {
+  border-bottom: 2px solid #e5e7eb;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.settlement-header th {
+  padding: 12px;
+  font-weight: 600;
+}
+
+.settlement-header th:first-child {
+  border-radius: 8px 0 0 0;
+}
+
+.settlement-header th:last-child {
+  border-radius: 0 8px 0 0;
+}
+
+.settlement-cell-left {
+  text-align: left;
+}
+
+.settlement-cell-right {
+  text-align: right;
+}
+
+.settlement-cell-center {
+  text-align: center;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  /* Header adjustments */
+  .header-content {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .header-title {
+    font-size: 1.5rem;
+  }
+
+  .action-buttons {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .calculate-organizer-btn,
+  .download-pdf-btn {
+    font-size: 0.8rem;
+    padding: 10px 12px;
+  }
+
+  /* Table containers */
+  .table-container {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .table-title {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+  }
+
+  /* Tables - make them scroll horizontally on mobile */
+  .table-scroll {
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+  }
+
+  .expenses-table {
+    min-width: 500px;
+  }
+
+  .expenses-table-cell,
+  .expenses-table-header th {
+    padding: 8px 6px;
+    font-size: 0.8rem;
+  }
+
+  .split-item {
+    font-size: 0.75rem;
+    margin-bottom: 1px;
+  }
+
+  /* Member cards */
+  .member-card {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .member-header {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+
+  .organizer-badge {
+    font-size: 0.65rem;
+    padding: 1px 6px;
+  }
+
+  .expenses-table-container {
+    padding: 8px;
+  }
+
+  .table-cell-left,
+  .table-cell-right,
+  .table-cell-index,
+  .table-cell-amount {
+    padding: 6px 4px;
+    font-size: 0.8rem;
+  }
+
+  /* Settlement table */
+  .settlement-table {
+    min-width: 600px;
+  }
+
+  .settlement-header th {
+    padding: 8px 6px;
+    font-size: 0.8rem;
+  }
+
+  /* Loading and error states */
+  .loading-container,
+  .error-container {
+    padding: 24px 16px;
+  }
+
+  .no-expenses {
+    padding: 24px 16px;
+  }
+
+  .no-expenses-icon {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small mobile adjustments */
+  .header-section {
+    padding: 16px;
+  }
+
+  .header-title {
+    font-size: 1.3rem;
+    gap: 6px;
+  }
+
+  .header-icon {
+    font-size: 1.5rem;
+  }
+
+  .table-container {
+    padding: 12px;
+  }
+
+  .table-title {
+    font-size: 1rem;
+    gap: 6px;
+  }
+
+  .table-icon {
+    font-size: 1.2rem;
+  }
+
+  /* Make tables even more compact */
+  .expenses-table {
+    min-width: 450px;
+  }
+
+  .expenses-table-cell,
+  .expenses-table-header th {
+    padding: 6px 4px;
+    font-size: 0.75rem;
+  }
+
+  .split-item {
+    font-size: 0.7rem;
+  }
+
+  .person-name {
+    font-weight: 600;
+  }
+
+  /* Member cards more compact */
+  .member-card {
+    padding: 10px;
+  }
+
+  .member-header {
+    font-size: 0.9rem;
+    gap: 6px;
+  }
+
+  .organizer-badge {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+  }
+
+  /* Settlement table */
+  .settlement-table {
+    min-width: 500px;
+  }
+
+  .settlement-header th {
+    padding: 6px 4px;
+    font-size: 0.75rem;
+  }
+
+  /* Buttons */
+  .calculate-organizer-btn,
+  .download-pdf-btn {
+    font-size: 0.75rem;
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .button-icon {
+    font-size: 0.9rem;
+  }
+
+  /* Adjust room info card */
+  .room-title {
+    font-size: 1.1rem;
+  }
+
+  .room-details {
+    font-size: 0.8rem;
+  }
+
+  .detail-label {
+    font-weight: 700;
+  }
+}

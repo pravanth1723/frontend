@@ -4,6 +4,7 @@ import axios from "axios";
 import Snackbar from "../Snackbar";
 import Spinner from "../Spinner";
 import { BACKEND_URL } from "../../config";
+import "./Finalize_and_preview.css";
 
 /**
  * Step 3 - Preview
@@ -176,34 +177,18 @@ export default function PreviewStep() {
 
   if (isLoading) {
     return (
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        padding: '40px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-        textAlign: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '16px'
-      }}>
+      <div className="loading-container">
         <Spinner size="large" color="var(--primary)" />
-        <div style={{ color: '#6b7280', fontSize: '1rem' }}>Loading preview...</div>
+        <div className="loading-text">Loading preview...</div>
       </div>
     );
   }
 
   if (!roomData) {
     return (
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        padding: '40px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-        textAlign: 'center'
-      }}>
-        <div style={{ fontSize: '3rem', marginBottom: '16px' }}>❌</div>
-        <div style={{ color: '#6b7280', fontSize: '1.1rem' }}>Room not found</div>
+      <div className="error-container">
+        <div className="error-icon">❌</div>
+        <div className="error-text">Room not found</div>
       </div>
     );
   }
@@ -215,84 +200,37 @@ export default function PreviewStep() {
   return (
     <div>
       {/* Header Section - Room Info */}
-      <div style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        borderRadius: '12px',
-        padding: '24px',
-        boxShadow: '0 8px 20px rgba(102, 126, 234, 0.3)',
-        marginBottom: '20px'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: '20px' }}>
-          <div style={{ flex: 1 }}>
-            <h3 style={{ 
-              fontSize: '1.75rem', 
-              marginBottom: '20px', 
-              fontWeight: '700',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px'
-            }}>
-              <span style={{ fontSize: '2rem' }}>📊</span>
+      <div className="header-section">
+        <div className="header-content">
+          <div className="header-info">
+            <h3 className="header-title">
+              <span className="header-icon">📊</span>
               Finalize & Preview
             </h3>
-            <div style={{ 
-              backgroundColor: 'rgba(255, 255, 255, 0.15)',
-              borderRadius: '8px',
-              padding: '16px',
-              marginBottom: '12px'
-            }}>
-              <div style={{ fontSize: '1.3rem', fontWeight: '700', marginBottom: '8px' }}>
+            <div className="room-info-card">
+              <div className="room-title">
                 {roomData.title || "(untitled)"}
               </div>
-              <div style={{ fontSize: '0.9rem', opacity: 0.9, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div className="room-details">
                 <div>
-                  <span style={{ fontWeight: '600' }}>👑 Organizer:</span> {organizer || "(none)"}
+                  <span className="detail-label">👑 Organizer:</span> {organizer || "(none)"}
                 </div>
                 <div>
-                  <span style={{ fontWeight: '600' }}>👥 Members:</span> {members.join(", ")}
+                  <span className="detail-label">👥 Members:</span> {members.join(", ")}
                 </div>
                 {roomData.notes && (
-                  <div style={{ marginTop: '8px', fontStyle: 'italic', opacity: 0.85 }}>
-                    <span style={{ fontWeight: '600' }}>📝 Notes:</span> {roomData.notes}
+                  <div className="room-notes">
+                    <span className="detail-label">📝 Notes:</span> {roomData.notes}
                   </div>
                 )}
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'stretch', minWidth: '200px' }}>
+          <div className="action-buttons">
             <button
               onClick={calculateBestOrganizer}
               disabled={isCalculatingOrganizer}
-              style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                border: '2px solid rgba(255, 255, 255, 0.3)',
-                padding: '10px 16px',
-                borderRadius: '8px',
-                fontWeight: '600',
-                fontSize: '0.9rem',
-                cursor: isCalculatingOrganizer ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                opacity: isCalculatingOrganizer ? 0.7 : 1,
-                whiteSpace: 'nowrap'
-              }}
-              onMouseEnter={(e) => {
-                if (!isCalculatingOrganizer) {
-                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                  e.target.style.transform = 'translateY(-1px)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isCalculatingOrganizer) {
-                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
-                  e.target.style.transform = 'translateY(0)';
-                }
-              }}
+              className={`calculate-organizer-btn ${isCalculatingOrganizer ? 'calculating' : ''}`}
             >
               {isCalculatingOrganizer ? (
                 <>
@@ -301,7 +239,7 @@ export default function PreviewStep() {
                 </>
               ) : (
                 <>
-                  <span style={{ fontSize: '1rem' }}>🎯</span>
+                  <span className="button-icon">🎯</span>
                   <span>Calculate Best Organizer</span>
                 </>
               )}
@@ -309,33 +247,9 @@ export default function PreviewStep() {
             
             <button 
               onClick={downloadPDF}
-              style={{
-                backgroundColor: 'white',
-                color: '#667eea',
-                border: 'none',
-                padding: '12px 16px',
-                borderRadius: '8px',
-                fontWeight: '600',
-                fontSize: '0.9rem',
-                cursor: 'pointer',
-                transition: 'all 0.3s',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                whiteSpace: 'nowrap'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-2px)';
-                e.target.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.15)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
-              }}
+              className="download-pdf-btn"
             >
-              <span style={{ fontSize: '1rem' }}>📥</span>
+              <span className="button-icon">📥</span>
               <span>Download PDF</span>
             </button>
           </div>
@@ -343,23 +257,9 @@ export default function PreviewStep() {
       </div>
 
       {/* All Expenses Table */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        padding: '24px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-        marginBottom: '20px'
-      }}>
-        <h4 style={{ 
-          fontSize: '1.3rem', 
-          marginBottom: '16px',
-          color: '#1f2937',
-          fontWeight: '700',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
-          <span style={{ fontSize: '1.5rem' }}>💰</span>
+      <div className="table-container">
+        <h4 className="table-title">
+          <span className="table-icon">💰</span>
           All Expenses
         </h4>
         {expenses.length === 0 ? (
@@ -438,23 +338,9 @@ export default function PreviewStep() {
       </div>
 
       {/* Per-person Expense Breakdown */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        padding: '24px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-        marginBottom: '20px'
-      }}>
-        <h4 style={{ 
-          fontSize: '1.3rem', 
-          marginBottom: '20px',
-          color: '#1f2937',
-          fontWeight: '700',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
-          <span style={{ fontSize: '1.5rem' }}>👤</span>
+      <div className="table-container">
+        <h4 className="table-title">
+          <span className="table-icon">👤</span>
           Individual Expense Breakdown
         </h4>
         {members.map(member => {
@@ -561,38 +447,20 @@ export default function PreviewStep() {
       </div>
 
       {/* Final Settlement Table */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        padding: '24px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-        marginBottom: '20px'
-      }}>
-        <h4 style={{ 
-          fontSize: '1.3rem', 
-          marginBottom: '16px',
-          color: '#1f2937',
-          fontWeight: '700',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
-          <span style={{ fontSize: '1.5rem' }}>💸</span>
+      <div className="table-container">
+        <h4 className="table-title">
+          <span className="table-icon">💸</span>
           Final Settlement (Payments to Organizer)
         </h4>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="table-scroll">
+          <table className="settlement-table">
             <thead>
-              <tr style={{ 
-                borderBottom: '2px solid #e5e7eb',
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                color: 'white'
-              }}>
-                <th style={{ padding: '12px', textAlign: 'left', borderRadius: '8px 0 0 0' }}>Person</th>
-                <th style={{ padding: '12px', textAlign: 'right' }}>Total Share</th>
-                <th style={{ padding: '12px', textAlign: 'right' }}>Total Paid</th>
-                <th style={{ padding: '12px', textAlign: 'right' }}>Balance</th>
-                <th style={{ padding: '12px', textAlign: 'center', borderRadius: '0 8px 0 0' }}>Action</th>
+              <tr className="settlement-header">
+                <th className="settlement-cell-left">Person</th>
+                <th className="settlement-cell-right">Total Share</th>
+                <th className="settlement-cell-right">Total Paid</th>
+                <th className="settlement-cell-right">Balance</th>
+                <th className="settlement-cell-center">Action</th>
               </tr>
             </thead>
             <tbody>
