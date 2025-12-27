@@ -316,7 +316,6 @@ export default function RoomsList({ rooms, onRoomsChange }) {
       {personalRooms.length > 0 && (
         <div style={{ marginBottom: '32px' }}>
           <h3 style={{ 
-            fontSize: '1.1rem', 
             marginBottom: '16px', 
             color: '#6b7280',
             fontWeight: '600',
@@ -349,7 +348,6 @@ export default function RoomsList({ rooms, onRoomsChange }) {
       {groupRooms.length > 0 && (
         <div>
           <h3 style={{ 
-            fontSize: '1.1rem', 
             marginBottom: '16px', 
             color: '#6b7280',
             fontWeight: '600',

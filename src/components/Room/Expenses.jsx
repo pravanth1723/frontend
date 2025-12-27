@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import EditExpenseModal from "../EditExpenseModal";
@@ -19,7 +19,6 @@ export default function Expenses() {
 
   const [roomTitle, setRoomTitle] = useState("");
   const [members, setMembers] = useState([]);
-  const [organizer, setOrganizer] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   const [apiExpenses, setApiExpenses] = useState([]);
@@ -38,19 +37,15 @@ export default function Expenses() {
   const [snackbar, setSnackbar] = useState(null);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
 
-  useEffect(() => {
-    fetchRoomData();
-    fetchExpenses();
-  }, [roomId]);
+  
 
-  async function fetchRoomData() {
+  const fetchRoomData = useCallback(async () => {
     try {
       const response = await axios.get(`${BACKEND_URL}/api/rooms/${roomId}`, { withCredentials: true });
       if (response.status === 200) {
         const data = response.data.data;
         setRoomTitle(data.title || data.name || "");
         setMembers(data.members || []); // Fixed: using 'members' from API
-        setOrganizer(data.organizer || "");
         setIsLoading(false);
       }
     } catch (error) {
@@ -58,9 +53,9 @@ export default function Expenses() {
       setSnackbar({ category: 'error', message: 'Failed to load room data' });
       setIsLoading(false);
     }
-  }
+  }, [roomId]);
 
-  async function fetchExpenses() {
+  const fetchExpenses = useCallback(async () => {
     try {
       const response = await axios.get(`${BACKEND_URL}/api/expenses/by-room-id/${roomId}`, { withCredentials: true });
       if (response.status === 200) {
@@ -69,7 +64,12 @@ export default function Expenses() {
     } catch (error) {
       console.error("Error fetching expenses:", error);
     }
-  }
+  }, [roomId]);
+
+  useEffect(() => {
+    fetchRoomData();
+    fetchExpenses();
+  }, [fetchRoomData, fetchExpenses]);
 
   function toggleMember(member) {
     setSelectedMembers(prev =>
@@ -128,9 +128,9 @@ export default function Expenses() {
       }, 0);
 
       if (Math.abs(individualTotal - totalAmount) > 0.01) {
-        setSnackbar({ 
-          category: 'error', 
-          message: `Individual amounts (₹${individualTotal.toFixed(2)}) must equal total paid (₹${totalAmount.toFixed(2)})` 
+        setSnackbar({
+          category: 'error',
+          message: `Individual amounts (₹${individualTotal.toFixed(2)}) must equal total paid (₹${totalAmount.toFixed(2)})`
         });
         return;
       }
@@ -321,8 +321,8 @@ export default function Expenses() {
             <label className="form-label required">Who Shares? *</label>
             <div className="members-grid">
               {members.map(member => (
-                <label 
-                  key={member} 
+                <label
+                  key={member}
                   className={`member-checkbox ${selectedMembers.includes(member) ? 'selected' : ''}`}
                 >
                   <input
@@ -495,7 +495,7 @@ export default function Expenses() {
       </div>
 
       {/* Calculator Component */}
-      <Calculator 
+      <Calculator
         isOpen={isCalculatorOpen}
         onClose={() => setIsCalculatorOpen(false)}
       />

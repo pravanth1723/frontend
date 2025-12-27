@@ -15,7 +15,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const [userstate, setUserState] = useContext(store);
+  const [, setUserState] = useContext(store);
   const [snackbar, setSnackbar] = useState(null);
   
   function handleSubmit(e) {

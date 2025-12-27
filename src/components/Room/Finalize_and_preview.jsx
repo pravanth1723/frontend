@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Snackbar from "../Snackbar";
@@ -19,6 +19,9 @@ export default function PreviewStep() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCalculatingOrganizer, setIsCalculatingOrganizer] = useState(false);
   const [snackbar, setSnackbar] = useState(null);
+
+  // derive organizer early so other functions can consistently use it
+  const organizer = roomData?.organizer || '';
 
   function downloadPDF() {
     const title = roomData?.title || 'expense_report';
@@ -134,11 +137,8 @@ export default function PreviewStep() {
     }
   }
 
-  useEffect(() => {
-    fetchData();
-  }, [roomId]);
-
-  async function fetchData() {
+  // memoize fetchData so it can be safely used in useEffect and elsewhere
+  const fetchData = useCallback(async () => {
     try {
       setIsLoading(true);
       
@@ -166,13 +166,18 @@ export default function PreviewStep() {
       setSnackbar({ category: 'error', message: 'Failed to load data. Please try again.' });
       setIsLoading(false);
     }
-  }
+  }, [roomId, navigate]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+
 
   function calculateBalances() {
     if (!roomData || !expenses.length) return { userPaidMap: {}, userOwesMap: {}, userExpenses: {} };
     
-    const members = roomData.members || [];
-    const organizer = roomData.organizer || '';
+  const members = roomData.members || [];
     
     // Calculate how much each person paid
     const userPaidMap = {};
@@ -243,7 +248,7 @@ export default function PreviewStep() {
 
   const { userPaidMap, userOwesMap, finalBalance, userExpenses } = calculateBalances();
   const members = roomData.members || [];
-  const organizer = roomData.organizer || '';
+  
 
   return (
     <div>

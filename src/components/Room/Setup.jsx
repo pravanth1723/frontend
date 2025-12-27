@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Snackbar from "../Snackbar";
@@ -32,11 +32,8 @@ export default function Setup() {
   const [isSaving, setIsSaving] = useState(false);
   const [snackbar, setSnackbar] = useState(null);
 
-  useEffect(() => {
-    fetchRoomMeta();
-  }, [roomId]);
-
-  function fetchRoomMeta() {
+  // memoize fetchRoomMeta so it can be safely referenced in useEffect
+  const fetchRoomMeta = useCallback(() => {
     setIsLoading(true);
     axios.get(`${BACKEND_URL}/api/rooms/${roomId}`, { withCredentials: true })
       .then(response => {
@@ -56,7 +53,11 @@ export default function Setup() {
         setSnackbar({ category: 'error', message: 'Failed to load room details' });
         setIsLoading(false);
       });
-  }
+  }, [roomId]);
+
+  useEffect(() => {
+    fetchRoomMeta();
+  }, [fetchRoomMeta]);
 
   function handleEdit() {
     setEditTitle(title);
