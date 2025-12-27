@@ -91,48 +91,70 @@ export default function PreviewStep() {
 
   function handleUPIPayment(amount, organizerName, payerName) {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
+
     if (!isMobile) {
-      setSnackbar({ 
-        category: 'error', 
-        message: 'UPI payments are only available on mobile devices' 
+      setSnackbar({
+        category: 'error',
+        message: 'UPI payments are only available on mobile devices'
       });
       return;
     }
 
     // Get organizer's UPI ID from room data
-    const organizerUpiId = roomData?.organizerUpiId;
+    const organizerUpiId = (roomData?.organizerUpiId || '').trim();
 
-    // Check if UPI ID is configured
-    if (!organizerUpiId) {
-      setSnackbar({ 
-        category: 'error', 
-        message: 'Organizer UPI ID not configured. Please ask the organizer to add their UPI ID in room setup.' 
+    // Basic VPA validation (very permissive but filters obvious mistakes)
+    const vpaRegex = /^[\w.+-]{2,}@[\w.-]{2,}$/;
+    if (!organizerUpiId || !vpaRegex.test(organizerUpiId)) {
+      setSnackbar({
+        category: 'error',
+        message: 'Organizer UPI ID is missing or invalid. Please ask the organizer to add a valid UPI ID (for example: name@bank).'
       });
       return;
     }
 
-    // Format amount to 2 decimal places
-    const formattedAmount = amount.toFixed(2);
-    
-    // Create transaction note
+    // Format amount to 2 decimal places (string)
+    const formattedAmount = Number(amount).toFixed(2);
+
+    // Create transaction note and unique reference
     const transactionNote = `Payment from ${payerName} to ${organizerName} - ${roomData?.title || 'Room Expense'}`;
-    
+    const txnRef = `splitit_${Date.now()}`;
+
+    // Build URL params safely
+    const params = new URLSearchParams({
+      pa: organizerUpiId,
+      pn: organizerName,
+      am: formattedAmount,
+      cu: 'INR',
+      tn: transactionNote,
+      tr: txnRef
+    });
+
+    const upiUrl = `upi://pay?${params.toString()}`;
+
     try {
-      // Generic UPI (shows all UPI apps)
-      const upiUrl = `upi://pay?pa=${organizerUpiId}&pn=${encodeURIComponent(organizerName)}&am=${formattedAmount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-      window.location.href = upiUrl;
-      
-      // Show success message
-      setSnackbar({ 
-        category: 'success', 
-        message: `UPI payment initiated for ₹${formattedAmount} to ${organizerName}` 
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      const isChrome = /Chrome\//i.test(navigator.userAgent);
+
+      // On Android+Chrome, using the intent URI sometimes works better
+      if (isAndroid && isChrome) {
+        // Don't include a package so user can choose their UPI app.
+        const intentUrl = `intent://upi/pay?${params.toString()}#Intent;scheme=upi;package=;end`;
+        window.location.href = intentUrl;
+      } else {
+        // Generic UPI link - lets the OS open any compatible UPI app
+        window.location.href = upiUrl;
+      }
+
+      setSnackbar({
+        category: 'info',
+        message: `Opening UPI app to pay ₹${formattedAmount} to ${organizerName}...`
       });
     } catch (error) {
       console.error('Error opening UPI app:', error);
-      setSnackbar({ 
-        category: 'error', 
-        message: 'Failed to open UPI app. Please try again.' 
+      setSnackbar({
+        category: 'error',
+        message: 'Failed to open UPI app. If you see an RBI policy message, ensure the recipient UPI ID is correct and try another UPI app.'
       });
     }
   }
