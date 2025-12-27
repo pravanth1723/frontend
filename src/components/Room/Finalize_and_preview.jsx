@@ -574,15 +574,82 @@ export default function PreviewStep() {
                     </td>
                     <td style={{ padding: '12px', textAlign: 'center', fontSize: '0.9rem' }}>
                       {isOrganizer ? (
-                        <span style={{ 
-                          fontWeight: '700',
-                          color: '#78350f',
-                          backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                          padding: '6px 12px',
-                          borderRadius: '6px'
-                        }}>
-                          💰 Collects from others
-                        </span>
+                        // Organizer's label should reflect whether they owe money or need to collect
+                        balance > 0 ? (
+                          // Build list of recipients who should receive money (they have negative balance)
+                          (() => {
+                            const recipients = members
+                              .filter(name => name !== organizer)
+                              .filter(name => (finalBalance[name] || 0) < 0)
+                              .map(name => ({ name, amount: Math.abs(finalBalance[name] || 0) }));
+
+                            if (recipients.length === 0) {
+                              return (
+                                <span style={{
+                                  fontWeight: '700',
+                                  color: '#b91c1c',
+                                  backgroundColor: 'rgba(254, 226, 226, 0.9)',
+                                  padding: '6px 12px',
+                                  borderRadius: '6px'
+                                }}>
+                                  💸 Pays ₹{balance.toFixed(2)} to others
+                                </span>
+                              );
+                            }
+
+                            return (
+                              <div style={{ textAlign: 'left' }}>
+                                <div style={{
+                                  fontWeight: '700',
+                                  color: '#b91c1c',
+                                  backgroundColor: 'rgba(254, 226, 226, 0.9)',
+                                  padding: '6px 12px',
+                                  borderRadius: '6px',
+                                  marginBottom: '8px'
+                                }}>
+                                  💸 Pays ₹{balance.toFixed(2)} to:
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                  {recipients.map(r => (
+                                    <div key={r.name} style={{
+                                      display: 'flex',
+                                      justifyContent: 'space-between',
+                                      alignItems: 'center',
+                                      backgroundColor: 'rgba(255,255,255,0.9)',
+                                      padding: '6px 10px',
+                                      borderRadius: '6px',
+                                      border: '1px solid #fee2e2'
+                                    }}>
+                                      <span style={{ fontWeight: 600 }}>{r.name}</span>
+                                      <span style={{ fontWeight: 700, color: '#b91c1c' }}>₹{r.amount.toFixed(2)}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          })()
+                        ) : balance < 0 ? (
+                          <span style={{
+                            fontWeight: '700',
+                            color: '#78350f',
+                            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                            padding: '6px 12px',
+                            borderRadius: '6px'
+                          }}>
+                            💰 Collects ₹{Math.abs(balance).toFixed(2)} from others
+                          </span>
+                        ) : (
+                          <span style={{
+                            color: '#6b7280',
+                            fontWeight: '600',
+                            backgroundColor: '#f3f4f6',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            display: 'inline-block'
+                          }}>
+                            ✅ Settled
+                          </span>
+                        )
                       ) : balance > 0 ? (
                         <div className="payment-action-container">
                           <span className="owes-amount-label">
@@ -592,7 +659,7 @@ export default function PreviewStep() {
                             onClick={() => handleUPIPayment(balance, organizer, m)}
                             className="upi-payment-btn"
                           >
-                            💳 Pay via UPI
+                            💳 Pay Organizer via UPI
                           </button>
                         </div>
                       ) : balance < 0 ? (
