@@ -16,14 +16,17 @@ export default function Setup() {
 
   const [roomName, setRoomName] = useState("");
   const [title, setTitle] = useState("");
+  const [kind, setKind] = useState('group');
   const [members, setmembers] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
   const [organizer, setOrganizer] = useState("");
   const [notes, setNotes] = useState("");
   
-
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editmembers, setEditmembers] = useState("");
+  const [editPaymentMethods, setEditPaymentMethods] = useState("");
   const [editOrganizer, setEditOrganizer] = useState("");
   const [editNotes, setEditNotes] = useState("");
   
@@ -41,10 +44,40 @@ export default function Setup() {
           const data = response.data.data;
           setRoomName(data.name || "");
           setTitle(data.title || "");
-          setmembers(data.members || []);
-          setOrganizer(data.organizer || "");
+          const roomKind = data.kind || 'group';
+          setKind(roomKind);
+
+          // Always keep backend members state (backend expects a 'members' array)
+          const backendMembers = data.members || [];
+          setmembers(Array.isArray(backendMembers) ? backendMembers : []);
+
+          // For UI: treat payment methods as a view-layer mapping for personal rooms,
+          // but backend variable stays as `members` (we'll send members on save).
+          let fetchedPaymentMethods = data.paymentMethods || data.payment_methods;
+          if (roomKind === 'personal') {
+            // if backend doesn't provide explicit paymentMethods, fall back to members
+            fetchedPaymentMethods = fetchedPaymentMethods || backendMembers;
+          }
+          setPaymentMethods(Array.isArray(fetchedPaymentMethods) ? fetchedPaymentMethods : []);
+
           setNotes(data.notes || "");
-          setIsLoading(false);
+
+          if (roomKind === 'personal') {
+            // ensure organizer is the current account username (account holder)
+            axios.get(`${BACKEND_URL}/api/users/me`, { withCredentials: true })
+              .then(userResp => {
+                const username = userResp.data?.data?.userId || data.organizer || "";
+                setOrganizer(username);
+              })
+              .catch(err => {
+                console.error("Error fetching current user:", err);
+                setOrganizer(data.organizer || "");
+              })
+              .finally(() => setIsLoading(false));
+          } else {
+            setOrganizer(data.organizer || "");
+            setIsLoading(false);
+          }
         }
       })
       .catch(error => {
@@ -61,6 +94,7 @@ export default function Setup() {
   function handleEdit() {
     setEditTitle(title);
     setEditmembers(members.join("\n"));
+    setEditPaymentMethods(paymentMethods.join("\n"));
     setEditOrganizer(organizer);
     setEditNotes(notes);
     setIsEditing(true);
@@ -72,38 +106,60 @@ export default function Setup() {
 
   function handleSave() {
     const trimmedTitle = editTitle.trim();
-    const membersArray = editmembers.split("\n").map(p => p.trim()).filter(p => p);
-    const trimmedOrganizer = editOrganizer.trim();
-  const trimmedNotes = editNotes.trim();
+    const trimmedNotes = editNotes.trim();
 
     if (!trimmedTitle) {
       setSnackbar({ category: 'error', message: 'Title is required' });
       return;
     }
-    if (membersArray.length < 2) {
-      setSnackbar({ category: 'error', message: 'At least 2 members are required' });
-      return;
+
+    // Build payload differently depending on room kind
+    let payload = { title: trimmedTitle, notes: trimmedNotes };
+
+    if (kind === 'personal') {
+      const paymentMethodsArray = editPaymentMethods.split("\n").map(p => p.trim()).filter(p => p);
+      if (paymentMethodsArray.length < 1) {
+        setSnackbar({ category: 'error', message: 'At least 1 payment method is required for personal rooms' });
+        return;
+      }
+      // For personal rooms: show payment methods in UI but keep backend variable name `members`.
+      payload.members = paymentMethodsArray;
+      // Organizer should be account holder (set from /api/users/me earlier)
+      payload.organizer = organizer;
+    } else {
+      const membersArray = editmembers.split("\n").map(p => p.trim()).filter(p => p);
+      const trimmedOrganizer = editOrganizer.trim();
+
+      if (membersArray.length < 2) {
+        setSnackbar({ category: 'error', message: 'At least 2 members are required' });
+        return;
+      }
+      if (!trimmedOrganizer || !membersArray.includes(trimmedOrganizer)) {
+        setSnackbar({ category: 'error', message: 'Organizer must be one of the members' });
+        return;
+      }
+
+      payload.members = membersArray;
+      payload.organizer = trimmedOrganizer;
     }
-    if (!trimmedOrganizer || !membersArray.includes(trimmedOrganizer)) {
-      setSnackbar({ category: 'error', message: 'Organizer must be one of the members' });
-      return;
-    }
-    
 
     setIsSaving(true);
-    axios.put(`${BACKEND_URL}/api/rooms/${roomId}`, {
-      title: trimmedTitle,
-      members: membersArray,
-      organizer: trimmedOrganizer,
-      notes: trimmedNotes
-    }, { withCredentials: true })
+    axios.put(`${BACKEND_URL}/api/rooms/${roomId}`, payload, { withCredentials: true })
       .then(response => {
         setIsSaving(false);
         if (response.status === 200) {
           setTitle(trimmedTitle);
-          setmembers(membersArray);
-          setOrganizer(trimmedOrganizer);
           setNotes(trimmedNotes);
+          if (kind === 'personal') {
+            // store both UI-facing paymentMethods and backend-facing members
+            setPaymentMethods(payload.members);
+            setmembers(payload.members);
+            // organizer remains the account holder
+            setOrganizer(payload.organizer);
+          } else {
+            setmembers(payload.members);
+            setOrganizer(payload.organizer);
+          }
           setIsEditing(false);
           setSnackbar({ category: 'success', message: 'Room details saved successfully!' });
         }
@@ -117,7 +173,8 @@ export default function Setup() {
   }
 
   function handleNext() {
-    if (!title || members.length < 2 || !organizer) {
+    const isReady = kind === 'personal' ? (paymentMethods.length >= 1 && !!organizer) : (members.length >= 2 && !!organizer);
+    if (!title || !isReady) {
       setSnackbar({ category: 'error', message: 'Please complete the room setup before proceeding' });
       return;
     }
@@ -255,26 +312,47 @@ export default function Setup() {
                 textTransform: 'uppercase',
                 letterSpacing: '0.5px'
               }}>
-                members
+                {kind === 'personal' ? 'Payment Methods' : 'Members'}
               </div>
               <div style={{ fontSize: '1.1rem', color: '#1f2937' }}>
-                {members.length > 0 ? (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {members.map((person, idx) => (
-                      <span key={idx} style={{
-                        backgroundColor: '#ede9fe',
-                        color: '#6b21a8',
-                        padding: '6px 12px',
-                        borderRadius: '6px',
-                        fontSize: '0.95rem',
-                        fontWeight: '500'
-                      }}>
-                        👤 {person}
-                      </span>
-                    ))}
-                  </div>
+                {kind === 'personal' ? (
+                  paymentMethods.length > 0 ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {paymentMethods.map((method, idx) => (
+                        <span key={idx} style={{
+                          backgroundColor: '#eef2ff',
+                          color: '#1e3a8a',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          fontSize: '0.95rem',
+                          fontWeight: '500'
+                        }}>
+                          💳 {method}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>N/A</span>
+                  )
                 ) : (
-                  <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>N/A</span>
+                  members.length > 0 ? (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      {members.map((person, idx) => (
+                        <span key={idx} style={{
+                          backgroundColor: '#ede9fe',
+                          color: '#6b21a8',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          fontSize: '0.95rem',
+                          fontWeight: '500'
+                        }}>
+                          👤 {person}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>N/A</span>
+                  )
                 )}
               </div>
             </div>
@@ -373,36 +451,69 @@ export default function Setup() {
               />
             </div>
 
-            <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '8px', 
-                fontWeight: '600',
-                color: '#374151',
-                fontSize: '0.95rem'
-              }}>
-                members (one per line) *
-              </label>
-              <textarea
-                value={editmembers}
-                onChange={(e) => setEditmembers(e.target.value)}
-                placeholder="Enter person names (one per line)"
-                rows={5}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '1rem',
-                  fontFamily: 'inherit',
-                  resize: 'vertical',
-                  transition: 'border-color 0.3s',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-              />
-            </div>
+            {kind === 'personal' ? (
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '8px', 
+                  fontWeight: '600',
+                  color: '#374151',
+                  fontSize: '0.95rem'
+                }}>
+                  Payment methods (one per line) *
+                </label>
+                <textarea
+                  value={editPaymentMethods}
+                  onChange={(e) => setEditPaymentMethods(e.target.value)}
+                  placeholder="Enter payment methods (one per line)"
+                  rows={4}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '1rem',
+                    fontFamily: 'inherit',
+                    resize: 'vertical',
+                    transition: 'border-color 0.3s',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                />
+              </div>
+            ) : (
+              <div>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '8px', 
+                  fontWeight: '600',
+                  color: '#374151',
+                  fontSize: '0.95rem'
+                }}>
+                  members (one per line) *
+                </label>
+                <textarea
+                  value={editmembers}
+                  onChange={(e) => setEditmembers(e.target.value)}
+                  placeholder="Enter person names (one per line)"
+                  rows={5}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    fontSize: '1rem',
+                    fontFamily: 'inherit',
+                    resize: 'vertical',
+                    transition: 'border-color 0.3s',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                />
+              </div>
+            )}
 
             <div>
               <label style={{ 
@@ -414,45 +525,54 @@ export default function Setup() {
               }}>
                 Organizer *
               </label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {editmembers.split("\n").map(p => p.trim()).filter(p => p).map((person, idx) => (
-                  <label key={idx} style={{ 
-                    display: 'flex', 
-                    alignItems: 'center',
-                    padding: '12px',
-                    backgroundColor: editOrganizer === person ? '#ede9fe' : '#f9fafb',
-                    borderRadius: '8px',
-                    cursor: 'pointer',
-                    border: `2px solid ${editOrganizer === person ? '#a78bfa' : '#e5e7eb'}`,
-                    transition: 'all 0.3s'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (editOrganizer !== person) {
-                      e.currentTarget.style.backgroundColor = '#f3f4f6';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (editOrganizer !== person) {
-                      e.currentTarget.style.backgroundColor = '#f9fafb';
-                    }
-                  }}>
-                    <input
-                      type="radio"
-                      name="organizer"
-                      value={person}
-                      checked={editOrganizer === person}
-                      onChange={(e) => setEditOrganizer(e.target.value)}
-                      style={{ marginRight: '10px', cursor: 'pointer' }}
-                    />
-                    <span style={{ 
-                      fontWeight: editOrganizer === person ? '600' : '500',
-                      color: editOrganizer === person ? '#6b21a8' : '#374151'
+              {kind === 'personal' ? (
+                <div style={{ padding: '12px', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
+                  <div style={{ fontWeight: '600', color: '#374151' }}>
+                    {organizer || <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>N/A</span>}
+                  </div>
+                  <div style={{ color: '#6b7280', fontSize: '0.9rem' }}>Organizer is the account holder for personal rooms and cannot be changed.</div>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {editmembers.split("\n").map(p => p.trim()).filter(p => p).map((person, idx) => (
+                    <label key={idx} style={{ 
+                      display: 'flex', 
+                      alignItems: 'center',
+                      padding: '12px',
+                      backgroundColor: editOrganizer === person ? '#ede9fe' : '#f9fafb',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      border: `2px solid ${editOrganizer === person ? '#a78bfa' : '#e5e7eb'}`,
+                      transition: 'all 0.3s'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (editOrganizer !== person) {
+                        e.currentTarget.style.backgroundColor = '#f3f4f6';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (editOrganizer !== person) {
+                        e.currentTarget.style.backgroundColor = '#f9fafb';
+                      }
                     }}>
-                      {person}
-                    </span>
-                  </label>
-                ))}
-              </div>
+                      <input
+                        type="radio"
+                        name="organizer"
+                        value={person}
+                        checked={editOrganizer === person}
+                        onChange={(e) => setEditOrganizer(e.target.value)}
+                        style={{ marginRight: '10px', cursor: 'pointer' }}
+                      />
+                      <span style={{ 
+                        fontWeight: editOrganizer === person ? '600' : '500',
+                        color: editOrganizer === person ? '#6b21a8' : '#374151'
+                      }}>
+                        {person}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
 
             

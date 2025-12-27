@@ -19,6 +19,9 @@ export default function Expenses() {
 
   const [roomTitle, setRoomTitle] = useState("");
   const [members, setMembers] = useState([]);
+  const [kind, setKind] = useState('group');
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [organizer, setOrganizer] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   const [apiExpenses, setApiExpenses] = useState([]);
@@ -45,8 +48,40 @@ export default function Expenses() {
       if (response.status === 200) {
         const data = response.data.data;
         setRoomTitle(data.title || data.name || "");
-        setMembers(data.members || []); // Fixed: using 'members' from API
-        setIsLoading(false);
+
+        const roomKind = data.kind || 'group';
+        setKind(roomKind);
+
+        // keep backend members as-is
+        const backendMembers = Array.isArray(data.members) ? data.members : [];
+        setMembers(backendMembers);
+
+        // UI-facing payment methods: use paymentMethods or fallback to members for personal rooms
+        let fetchedPaymentMethods = data.paymentMethods || data.payment_methods;
+        if (roomKind === 'personal') {
+          fetchedPaymentMethods = fetchedPaymentMethods || backendMembers;
+        }
+        setPaymentMethods(Array.isArray(fetchedPaymentMethods) ? fetchedPaymentMethods : []);
+
+        if (roomKind === 'personal') {
+          // set organizer to current account holder
+          axios.get(`${BACKEND_URL}/api/users/me`, { withCredentials: true })
+            .then(userResp => {
+              const username = userResp.data?.data?.username || data.organizer || "";
+              setOrganizer(username);
+              // in personal rooms, shares are always organizer
+              if (username) setSelectedMembers([username]);
+            })
+            .catch(err => {
+              console.error('Error fetching current user:', err);
+              setOrganizer(data.organizer || "");
+              if (data.organizer) setSelectedMembers([data.organizer]);
+            })
+            .finally(() => setIsLoading(false));
+        } else {
+          setOrganizer(data.organizer || "");
+          setIsLoading(false);
+        }
       }
     } catch (error) {
       console.error("Error fetching room data:", error);
@@ -72,6 +107,8 @@ export default function Expenses() {
   }, [fetchRoomData, fetchExpenses]);
 
   function toggleMember(member) {
+    // For personal rooms, shares are always organizer and cannot be toggled
+    if (kind === 'personal') return;
     setSelectedMembers(prev =>
       prev.includes(member) ? prev.filter(m => m !== member) : [...prev, member]
     );
@@ -105,10 +142,21 @@ export default function Expenses() {
       setSnackbar({ category: 'error', message: 'Description is required' });
       return;
     }
-    if (selectedMembers.length === 0) {
-      setSnackbar({ category: 'error', message: 'Please select at least one member to share the expense' });
-      return;
+    if (kind === 'personal') {
+      // In personal rooms, shares are always the organizer
+      if (!organizer) {
+        setSnackbar({ category: 'error', message: 'Organizer needed for personal rooms' });
+        return;
+      }
+      // ensure selectedMembers contains organizer
+      if (!selectedMembers.includes(organizer)) setSelectedMembers([organizer]);
+    } else {
+      if (selectedMembers.length === 0) {
+        setSnackbar({ category: 'error', message: 'Please select at least one member to share the expense' });
+        return;
+      }
     }
+
     if (payers.length === 0) {
       setSnackbar({ category: 'error', message: 'Please add at least one paid-by entry' });
       return;
@@ -118,6 +166,7 @@ export default function Expenses() {
 
     let spentFor;
     if (splitType === "equal") {
+      // For personal rooms, selectedMembers is organizer only, so they bear the full amount
       spentFor = selectedMembers.map(name => ({
         name,
         amount: totalAmount / selectedMembers.length
@@ -146,7 +195,9 @@ export default function Expenses() {
       description: description.trim(),
       category: "expense",
       total: totalAmount,
+      // keep backend variable names unchanged: spentBy contains payer names (payment methods for personal rooms)
       spentBy: payers.map(p => ({ name: p.name, amount: parseFloat(p.amount) })),
+      // spentFor contains the people who share (organizer for personal rooms)
       spentFor: spentFor
     };
 
@@ -235,10 +286,10 @@ export default function Expenses() {
           </button>
         </div>
         <div className="expenses-members">
-          <span className="expenses-members-label">Members:</span>
-          {members.map((member, idx) => (
+          <span className="expenses-members-label">{kind === 'personal' ? 'Payment Methods:' : 'Members:'}</span>
+          {(kind === 'personal' ? paymentMethods : members).map((item, idx) => (
             <span key={idx} className="member-badge">
-              {member}
+              {kind === 'personal' ? '💳 ' + item : item}
             </span>
           ))}
         </div>
@@ -263,7 +314,7 @@ export default function Expenses() {
           </div>
 
           <div className="form-group">
-            <label className="form-label required">Paid By *</label>
+            <label className="form-label required">Paid via *</label>
             <div className="payers-list">
               {payers.length === 0 && (
                 <div className="no-payers">
@@ -291,9 +342,9 @@ export default function Expenses() {
                 onChange={(e) => setNewPayerName(e.target.value)}
                 className="payer-select"
               >
-                <option value="">Select person</option>
-                {members.map(member => (
-                  <option key={member} value={member}>{member}</option>
+                <option value="">{kind === 'personal' ? 'Select payment method' : 'Select person'}</option>
+                {(kind === 'personal' ? paymentMethods : members).map(item => (
+                  <option key={item} value={item}>{item}</option>
                 ))}
               </select>
               <input
@@ -319,21 +370,30 @@ export default function Expenses() {
 
           <div className="form-group">
             <label className="form-label required">Who Shares? *</label>
-            <div className="members-grid">
-              {members.map(member => (
-                <label
-                  key={member}
-                  className={`member-checkbox ${selectedMembers.includes(member) ? 'selected' : ''}`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedMembers.includes(member)}
-                    onChange={() => toggleMember(member)}
-                  />
-                  {member}
-                </label>
-              ))}
-            </div>
+            {kind === 'personal' ? (
+              <div className="personal-share-note">
+                <div style={{ padding: '12px', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
+                  <div style={{ fontWeight: '600' }}>{organizer || <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>N/A</span>}</div>
+                  <div style={{ color: '#6b7280', fontSize: '0.9rem' }}>In personal rooms, the organizer (account holder) always bears the expense.</div>
+                </div>
+              </div>
+            ) : (
+              <div className="members-grid">
+                {members.map(member => (
+                  <label
+                    key={member}
+                    className={`member-checkbox ${selectedMembers.includes(member) ? 'selected' : ''}`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedMembers.includes(member)}
+                      onChange={() => toggleMember(member)}
+                    />
+                    {member}
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
 
           {selectedMembers.length > 0 && (
@@ -456,7 +516,7 @@ export default function Expenses() {
                     <div className="expense-details">
                       <div>
                         <div className="expense-section-title">
-                          💳 Paid By
+                          💳 Paid via
                         </div>
                         {expense.spentBy.map((s, idx) => (
                           <div key={idx} className="expense-detail-item">

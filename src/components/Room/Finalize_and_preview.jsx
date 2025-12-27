@@ -232,24 +232,26 @@ export default function PreviewStep() {
             </div>
           </div>
           <div className="action-buttons">
-            <button
-              onClick={calculateBestOrganizer}
-              disabled={isCalculatingOrganizer}
-              className={`calculate-organizer-btn ${isCalculatingOrganizer ? 'calculating' : ''}`}
-            >
-              {isCalculatingOrganizer ? (
-                <>
-                  <Spinner size="small" color="#ffffff" />
-                  <span>Calculating...</span>
-                </>
-              ) : (
-                <>
-                  <span className="button-icon">🎯</span>
-                  <span>Calculate Best Organizer</span>
-                </>
-              )}
-            </button>
-            
+            {roomData?.kind !== 'personal' && (
+              <button
+                onClick={calculateBestOrganizer}
+                disabled={isCalculatingOrganizer}
+                className={`calculate-organizer-btn ${isCalculatingOrganizer ? 'calculating' : ''}`}
+              >
+                {isCalculatingOrganizer ? (
+                  <>
+                    <Spinner size="small" color="#ffffff" />
+                    <span>Calculating...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="button-icon">🎯</span>
+                    <span>Calculate Best Organizer</span>
+                  </>
+                )}
+              </button>
+            )}
+
             <button 
               onClick={downloadPDF}
               className="download-pdf-btn"
@@ -343,7 +345,8 @@ export default function PreviewStep() {
       </div>
 
       {/* Per-person Expense Breakdown */}
-      <div className="table-container">
+     {roomData?.kind !== 'personal' && (
+       <div className="table-container">
         <h4 className="table-title">
           <span className="table-icon">👤</span>
           Individual Expense Breakdown
@@ -449,149 +452,179 @@ export default function PreviewStep() {
             </div>
           );
         })}
-      </div>
+      </div>)}
 
       {/* Final Settlement Table */}
-      <div className="table-container">
-        <h4 className="table-title">
-          <span className="table-icon">💸</span>
-          Final Settlement (Payments to Organizer)
-        </h4>
-        <div className="table-scroll">
-          <table className="settlement-table">
-            <thead>
-              <tr className="settlement-header">
-                <th className="settlement-cell-left">Person</th>
-                <th className="settlement-cell-right">Total Share</th>
-                <th className="settlement-cell-right">Total Paid</th>
-                <th className="settlement-cell-right">Balance</th>
-                <th className="settlement-cell-center">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {members.map(m => {
-                const share = userOwesMap[m] || 0;
-                const paid = userPaidMap[m] || 0;
-                const balance = finalBalance[m] || 0;
-                const isOrganizer = m === organizer;
-                
-                return (
-                  <tr key={m} style={{ 
-                    borderBottom: '1px solid #f3f4f6',
-                    background: isOrganizer ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%)' : 'transparent',
-                    transition: 'background-color 0.2s'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isOrganizer) e.currentTarget.style.backgroundColor = '#f9fafb';
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isOrganizer) e.currentTarget.style.backgroundColor = 'transparent';
-                  }}>
-                    <td style={{ 
-                      padding: '12px',
-                      fontWeight: isOrganizer ? 700 : 500,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
+      {roomData?.kind !== 'personal' && (
+        <div className="table-container">
+          <h4 className="table-title">
+            <span className="table-icon">💸</span>
+            Final Settlement (Payments to Organizer)
+          </h4>
+          <div className="table-scroll">
+            <table className="settlement-table">
+              <thead>
+                <tr className="settlement-header">
+                  <th className="settlement-cell-left">Person</th>
+                  <th className="settlement-cell-right">Total Share</th>
+                  <th className="settlement-cell-right">Total Paid</th>
+                  <th className="settlement-cell-right">Balance</th>
+                  <th className="settlement-cell-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {members.map(m => {
+                  const share = userOwesMap[m] || 0;
+                  const paid = userPaidMap[m] || 0;
+                  const balance = finalBalance[m] || 0;
+                  const isOrganizer = m === organizer;
+                  
+                  return (
+                    <tr key={m} style={{ 
+                      borderBottom: '1px solid #f3f4f6',
+                      background: isOrganizer ? 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%)' : 'transparent',
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isOrganizer) e.currentTarget.style.backgroundColor = '#f9fafb';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isOrganizer) e.currentTarget.style.backgroundColor = 'transparent';
                     }}>
-                      <span>{isOrganizer ? '👑' : '👤'}</span>
-                      {m}
-                      {isOrganizer && (
-                        <span style={{ 
-                          fontSize: '0.7rem',
-                          color: '#78350f',
-                          backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          fontWeight: '600'
-                        }}>
-                          Organizer
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: '12px', textAlign: 'right', fontWeight: '600' }}>
-                      ₹{share.toFixed(2)}
-                    </td>
-                    <td style={{ padding: '12px', textAlign: 'right', fontWeight: '600' }}>
-                      ₹{paid.toFixed(2)}
-                    </td>
-                    <td style={{ 
-                      padding: '12px',
-                      textAlign: 'right',
-                      fontWeight: 700,
-                      fontSize: '1.05rem',
-                      color: balance > 0 ? '#dc2626' : balance < 0 ? '#059669' : '#6b7280'
-                    }}>
-                      {balance > 0 ? `₹${balance.toFixed(2)}` : balance < 0 ? `-₹${Math.abs(balance).toFixed(2)}` : '₹0.00'}
-                    </td>
-                    <td style={{ padding: '12px', textAlign: 'center', fontSize: '0.9rem' }}>
-                      {isOrganizer ? (
-                        // Organizer's label should reflect whether they owe money or need to collect
-                        balance > 0 ? (
-                          // Build list of recipients who should receive money (they have negative balance)
-                          (() => {
-                            const recipients = members
-                              .filter(name => name !== organizer)
-                              .filter(name => (finalBalance[name] || 0) < 0)
-                              .map(name => ({ name, amount: Math.abs(finalBalance[name] || 0) }));
-
-                            if (recipients.length === 0) {
-                              return (
-                                <span style={{
-                                  fontWeight: '700',
-                                  color: '#b91c1c',
-                                  backgroundColor: 'rgba(254, 226, 226, 0.9)',
-                                  padding: '6px 12px',
-                                  borderRadius: '6px'
-                                }}>
-                                  💸 Pays ₹{balance.toFixed(2)} to others
-                                </span>
-                              );
-                            }
-
-                            return (
-                              <div style={{ textAlign: 'left' }}>
-                                <div style={{
-                                  fontWeight: '700',
-                                  color: '#b91c1c',
-                                  backgroundColor: 'rgba(254, 226, 226, 0.9)',
-                                  padding: '6px 12px',
-                                  borderRadius: '6px',
-                                  marginBottom: '8px'
-                                }}>
-                                  💸 Pays ₹{balance.toFixed(2)} to:
-                                </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                                  {recipients.map(r => (
-                                    <div key={r.name} style={{
-                                      display: 'flex',
-                                      justifyContent: 'space-between',
-                                      alignItems: 'center',
-                                      backgroundColor: 'rgba(255,255,255,0.9)',
-                                      padding: '6px 10px',
-                                      borderRadius: '6px',
-                                      border: '1px solid #fee2e2'
-                                    }}>
-                                      <span style={{ fontWeight: 600 }}>{r.name}</span>
-                                      <span style={{ fontWeight: 700, color: '#b91c1c' }}>₹{r.amount.toFixed(2)}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            );
-                          })()
-                        ) : balance < 0 ? (
-                          <span style={{
-                            fontWeight: '700',
+                      <td style={{ 
+                        padding: '12px',
+                        fontWeight: isOrganizer ? 700 : 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}>
+                        <span>{isOrganizer ? '👑' : '👤'}</span>
+                        {m}
+                        {isOrganizer && (
+                          <span style={{ 
+                            fontSize: '0.7rem',
                             color: '#78350f',
                             backgroundColor: 'rgba(255, 255, 255, 0.7)',
-                            padding: '6px 12px',
-                            borderRadius: '6px'
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            fontWeight: '600'
                           }}>
-                            💰 Collects ₹{Math.abs(balance).toFixed(2)} from others
+                            Organizer
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: '12px', textAlign: 'right', fontWeight: '600' }}>
+                        ₹{share.toFixed(2)}
+                      </td>
+                      <td style={{ padding: '12px', textAlign: 'right', fontWeight: '600' }}>
+                        ₹{paid.toFixed(2)}
+                      </td>
+                      <td style={{ 
+                        padding: '12px',
+                        textAlign: 'right',
+                        fontWeight: 700,
+                        fontSize: '1.05rem',
+                        color: balance > 0 ? '#dc2626' : balance < 0 ? '#059669' : '#6b7280'
+                      }}>
+                        {balance > 0 ? `₹${balance.toFixed(2)}` : balance < 0 ? `-₹${Math.abs(balance).toFixed(2)}` : '₹0.00'}
+                      </td>
+                      <td style={{ padding: '12px', textAlign: 'center', fontSize: '0.9rem' }}>
+                        {isOrganizer ? (
+                          // Organizer's label should reflect whether they owe money or need to collect
+                          balance > 0 ? (
+                            // Build list of recipients who should receive money (they have negative balance)
+                            (() => {
+                              const recipients = members
+                                .filter(name => name !== organizer)
+                                .filter(name => (finalBalance[name] || 0) < 0)
+                                .map(name => ({ name, amount: Math.abs(finalBalance[name] || 0) }));
+
+                              if (recipients.length === 0) {
+                                return (
+                                  <span style={{
+                                    fontWeight: '700',
+                                    color: '#b91c1c',
+                                    backgroundColor: 'rgba(254, 226, 226, 0.9)',
+                                    padding: '6px 12px',
+                                    borderRadius: '6px'
+                                  }}>
+                                    💸 Pays ₹{balance.toFixed(2)} to others
+                                  </span>
+                                );
+                              }
+
+                              return (
+                                <div style={{ textAlign: 'left' }}>
+                                  <div style={{
+                                    fontWeight: '700',
+                                    color: '#b91c1c',
+                                    backgroundColor: 'rgba(254, 226, 226, 0.9)',
+                                    padding: '6px 12px',
+                                    borderRadius: '6px',
+                                    marginBottom: '8px'
+                                  }}>
+                                    💸 Pays ₹{balance.toFixed(2)} to:
+                                  </div>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                    {recipients.map(r => (
+                                      <div key={r.name} style={{
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        backgroundColor: 'rgba(255,255,255,0.9)',
+                                        padding: '6px 10px',
+                                        borderRadius: '6px',
+                                        border: '1px solid #fee2e2'
+                                      }}>
+                                        <span style={{ fontWeight: 600 }}>{r.name}</span>
+                                        <span style={{ fontWeight: 700, color: '#b91c1c' }}>₹{r.amount.toFixed(2)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            })()
+                          ) : balance < 0 ? (
+                            <span style={{
+                              fontWeight: '700',
+                              color: '#78350f',
+                              backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                              padding: '6px 12px',
+                              borderRadius: '6px'
+                            }}>
+                              💰 Collects ₹{Math.abs(balance).toFixed(2)} from others
+                            </span>
+                          ) : (
+                            <span style={{
+                              color: '#6b7280',
+                              fontWeight: '600',
+                              backgroundColor: '#f3f4f6',
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              display: 'inline-block'
+                            }}>
+                              ✅ Settled
+                            </span>
+                          )
+                        ) : balance > 0 ? (
+                          <div className="payment-action-container">
+                            <span className="owes-amount-label">
+                              📤 Owes ₹{balance.toFixed(2)}
+                            </span>
+                          </div>
+                        ) : balance < 0 ? (
+                          <span style={{ 
+                            color: '#059669',
+                            fontWeight: '600',
+                            backgroundColor: '#d1fae5',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            display: 'inline-block'
+                          }}>
+                            📥 Receive ₹{Math.abs(balance).toFixed(2)}
                           </span>
                         ) : (
-                          <span style={{
+                          <span style={{ 
                             color: '#6b7280',
                             fontWeight: '600',
                             backgroundColor: '#f3f4f6',
@@ -601,62 +634,34 @@ export default function PreviewStep() {
                           }}>
                             ✅ Settled
                           </span>
-                        )
-                      ) : balance > 0 ? (
-                        <div className="payment-action-container">
-                          <span className="owes-amount-label">
-                            📤 Owes ₹{balance.toFixed(2)}
-                          </span>
-                        </div>
-                      ) : balance < 0 ? (
-                        <span style={{ 
-                          color: '#059669',
-                          fontWeight: '600',
-                          backgroundColor: '#d1fae5',
-                          padding: '6px 12px',
-                          borderRadius: '6px',
-                          display: 'inline-block'
-                        }}>
-                          📥 Receive ₹{Math.abs(balance).toFixed(2)}
-                        </span>
-                      ) : (
-                        <span style={{ 
-                          color: '#6b7280',
-                          fontWeight: '600',
-                          backgroundColor: '#f3f4f6',
-                          padding: '6px 12px',
-                          borderRadius: '6px',
-                          display: 'inline-block'
-                        }}>
-                          ✅ Settled
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div style={{ 
+            marginTop: '16px',
+            padding: '12px',
+            backgroundColor: '#eff6ff',
+            borderRadius: '8px',
+            border: '1px solid #bfdbfe',
+            color: '#1e40af',
+            fontSize: '0.9rem',
+            fontStyle: 'italic',
+            display: 'flex',
+            alignItems: 'start',
+            gap: '8px'
+          }}>
+            <span style={{ fontSize: '1.2rem' }}>💡</span>
+            <span>
+              <strong>Note:</strong> Positive balance means the person owes money to the organizer. Negative balance means the person paid more than their share.
+            </span>
+          </div>
         </div>
-        <div style={{ 
-          marginTop: '16px',
-          padding: '12px',
-          backgroundColor: '#eff6ff',
-          borderRadius: '8px',
-          border: '1px solid #bfdbfe',
-          color: '#1e40af',
-          fontSize: '0.9rem',
-          fontStyle: 'italic',
-          display: 'flex',
-          alignItems: 'start',
-          gap: '8px'
-        }}>
-          <span style={{ fontSize: '1.2rem' }}>💡</span>
-          <span>
-            <strong>Note:</strong> Positive balance means the person owes money to the organizer. Negative balance means the person paid more than their share.
-          </span>
-        </div>
-      </div>
+      )}
 
       {snackbar && (
         <Snackbar
