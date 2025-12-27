@@ -138,9 +138,25 @@ export default function PreviewStep() {
 
       // On Android+Chrome, using the intent URI sometimes works better
       if (isAndroid && isChrome) {
-        // Don't include a package so user can choose their UPI app.
-        const intentUrl = `intent://upi/pay?${params.toString()}#Intent;scheme=upi;package=;end`;
-        window.location.href = intentUrl;
+        // Try opening the intent in a new tab/window so the current app tab isn't replaced
+        // by Chrome's error page when the intent isn't handled.
+        const intentUrl = `intent://upi/pay?${params.toString()}#Intent;scheme=upi;end`;
+        let opened = null;
+        try {
+          opened = window.open(intentUrl, '_blank');
+        } catch (e) {
+          opened = null;
+        }
+
+        if (!opened) {
+          // window.open was blocked or failed — navigate current tab to the generic upi:// link
+          try {
+            window.location.href = upiUrl;
+          } catch (e) {
+            // ignore
+          }
+        }
+        // If opened succeeded we keep the current tab unchanged to avoid Chrome error page.
       } else {
         // Generic UPI link - lets the OS open any compatible UPI app
         window.location.href = upiUrl;
