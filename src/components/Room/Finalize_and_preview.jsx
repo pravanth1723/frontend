@@ -89,92 +89,6 @@ export default function PreviewStep() {
     }
   }
 
-  function handleUPIPayment(amount, organizerName, payerName) {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    if (!isMobile) {
-      setSnackbar({
-        category: 'error',
-        message: 'UPI payments are only available on mobile devices'
-      });
-      return;
-    }
-
-    // Get organizer's UPI ID from room data
-    const organizerUpiId = (roomData?.organizerUpiId || '').trim();
-
-    // Basic VPA validation (very permissive but filters obvious mistakes)
-    const vpaRegex = /^[\w.+-]{2,}@[\w.-]{2,}$/;
-    if (!organizerUpiId || !vpaRegex.test(organizerUpiId)) {
-      setSnackbar({
-        category: 'error',
-        message: 'Organizer UPI ID is missing or invalid. Please ask the organizer to add a valid UPI ID (for example: name@bank).'
-      });
-      return;
-    }
-
-    // Format amount to 2 decimal places (string)
-    const formattedAmount = Number(amount).toFixed(2);
-
-    // Create transaction note and unique reference
-    const transactionNote = `Payment from ${payerName} to ${organizerName} - ${roomData?.title || 'Room Expense'}`;
-    const txnRef = `splitit_${Date.now()}`;
-
-    // Build URL params safely
-    const params = new URLSearchParams({
-      pa: organizerUpiId,
-      pn: organizerName,
-      am: formattedAmount,
-      cu: 'INR',
-      tn: transactionNote,
-      tr: txnRef
-    });
-
-    const upiUrl = `upi://pay?${params.toString()}`;
-
-    try {
-      const isAndroid = /Android/i.test(navigator.userAgent);
-      const isChrome = /Chrome\//i.test(navigator.userAgent);
-
-      // On Android+Chrome, using the intent URI sometimes works better
-      if (isAndroid && isChrome) {
-        // Try opening the intent in a new tab/window so the current app tab isn't replaced
-        // by Chrome's error page when the intent isn't handled.
-        const intentUrl = `intent://upi/pay?${params.toString()}#Intent;scheme=upi;end`;
-        let opened = null;
-        try {
-          opened = window.open(intentUrl, '_blank');
-        } catch (e) {
-          opened = null;
-        }
-
-        if (!opened) {
-          // window.open was blocked or failed — navigate current tab to the generic upi:// link
-          try {
-            window.location.href = upiUrl;
-          } catch (e) {
-            // ignore
-          }
-        }
-        // If opened succeeded we keep the current tab unchanged to avoid Chrome error page.
-      } else {
-        // Generic UPI link - lets the OS open any compatible UPI app
-        window.location.href = upiUrl;
-      }
-
-      setSnackbar({
-        category: 'info',
-        message: `Opening UPI app to pay ₹${formattedAmount} to ${organizerName}...`
-      });
-    } catch (error) {
-      console.error('Error opening UPI app:', error);
-      setSnackbar({
-        category: 'error',
-        message: 'Failed to open UPI app. If you see an RBI policy message, ensure the recipient UPI ID is correct and try another UPI app.'
-      });
-    }
-  }
-
   // memoize fetchData so it can be safely used in useEffect and elsewhere
   const fetchData = useCallback(async () => {
     try {
@@ -289,7 +203,7 @@ export default function PreviewStep() {
   
 
   return (
-    <div>
+    <div className="finalize-page-container">
       {/* Header Section - Room Info */}
       <div className="header-section">
         <div className="header-content">
@@ -693,12 +607,6 @@ export default function PreviewStep() {
                           <span className="owes-amount-label">
                             📤 Owes ₹{balance.toFixed(2)}
                           </span>
-                          <button
-                            onClick={() => handleUPIPayment(balance, organizer, m)}
-                            className="upi-payment-btn"
-                          >
-                            💳 Pay Organizer via UPI
-                          </button>
                         </div>
                       ) : balance < 0 ? (
                         <span style={{ 

@@ -66,7 +66,7 @@ export default function CreateRoom({ onRoomCreated }) {
           fontSize: '0.9rem',
           opacity: 0.9
         }}>
-          Room ID
+          Room Name
         </label>
         <input 
           className="input" 

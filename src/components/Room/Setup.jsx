@@ -19,14 +19,14 @@ export default function Setup() {
   const [members, setmembers] = useState([]);
   const [organizer, setOrganizer] = useState("");
   const [notes, setNotes] = useState("");
-  const [organizerUpiId, setOrganizerUpiId] = useState("");
+  
 
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editmembers, setEditmembers] = useState("");
   const [editOrganizer, setEditOrganizer] = useState("");
   const [editNotes, setEditNotes] = useState("");
-  const [editOrganizerUpiId, setEditOrganizerUpiId] = useState("");
+  
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -44,7 +44,6 @@ export default function Setup() {
           setmembers(data.members || []);
           setOrganizer(data.organizer || "");
           setNotes(data.notes || "");
-          setOrganizerUpiId(data.organizerUpiId || "");
           setIsLoading(false);
         }
       })
@@ -64,7 +63,6 @@ export default function Setup() {
     setEditmembers(members.join("\n"));
     setEditOrganizer(organizer);
     setEditNotes(notes);
-    setEditOrganizerUpiId(organizerUpiId);
     setIsEditing(true);
   }
 
@@ -76,8 +74,7 @@ export default function Setup() {
     const trimmedTitle = editTitle.trim();
     const membersArray = editmembers.split("\n").map(p => p.trim()).filter(p => p);
     const trimmedOrganizer = editOrganizer.trim();
-    const trimmedNotes = editNotes.trim();
-    const trimmedUpiId = editOrganizerUpiId.trim();
+  const trimmedNotes = editNotes.trim();
 
     if (!trimmedTitle) {
       setSnackbar({ category: 'error', message: 'Title is required' });
@@ -91,18 +88,14 @@ export default function Setup() {
       setSnackbar({ category: 'error', message: 'Organizer must be one of the members' });
       return;
     }
-    if (trimmedUpiId && !trimmedUpiId.includes('@')) {
-      setSnackbar({ category: 'error', message: 'UPI ID must contain @ symbol (e.g., name@paytm)' });
-      return;
-    }
+    
 
     setIsSaving(true);
     axios.put(`${BACKEND_URL}/api/rooms/${roomId}`, {
       title: trimmedTitle,
       members: membersArray,
       organizer: trimmedOrganizer,
-      notes: trimmedNotes,
-      organizerUpiId: trimmedUpiId
+      notes: trimmedNotes
     }, { withCredentials: true })
       .then(response => {
         setIsSaving(false);
@@ -111,7 +104,6 @@ export default function Setup() {
           setmembers(membersArray);
           setOrganizer(trimmedOrganizer);
           setNotes(trimmedNotes);
-          setOrganizerUpiId(trimmedUpiId);
           setIsEditing(false);
           setSnackbar({ category: 'success', message: 'Room details saved successfully!' });
         }
@@ -322,41 +314,7 @@ export default function Setup() {
               </div>
             </div>
 
-            <div style={{
-              padding: '16px',
-              backgroundColor: '#f9fafb',
-              borderRadius: '10px',
-              border: '1px solid #e5e7eb'
-            }}>
-              <div style={{ 
-                fontSize: '0.85rem', 
-                color: '#6b7280', 
-                marginBottom: '6px',
-                fontWeight: '600',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}>
-                Organizer UPI ID
-              </div>
-              <div style={{ fontSize: '1.1rem', color: '#1f2937' }}>
-                {organizerUpiId ? (
-                  <span style={{
-                    backgroundColor: '#dcfce7',
-                    color: '#166534',
-                    padding: '6px 12px',
-                    borderRadius: '6px',
-                    fontSize: '0.95rem',
-                    fontWeight: '500',
-                    display: 'inline-block',
-                    fontFamily: 'monospace'
-                  }}>
-                    💳 {organizerUpiId}
-                  </span>
-                ) : (
-                  <span style={{ color: '#9ca3af', fontStyle: 'italic' }}>Not set - UPI payments will be disabled</span>
-                )}
-              </div>
-            </div>
+            
 
             <div style={{
               padding: '16px',
@@ -497,42 +455,7 @@ export default function Setup() {
               </div>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '8px', 
-                fontWeight: '600',
-                color: '#374151',
-                fontSize: '0.95rem'
-              }}>
-                Organizer UPI ID <span style={{ color: '#6b7280', fontWeight: '400' }}>(Optional)</span>
-              </label>
-              <input
-                type="text"
-                value={editOrganizerUpiId}
-                onChange={(e) => setEditOrganizerUpiId(e.target.value)}
-                placeholder="e.g., yourname@paytm, username@upi"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '8px',
-                  fontSize: '1rem',
-                  fontFamily: 'monospace',
-                  transition: 'border-color 0.3s',
-                  boxSizing: 'border-box'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-              />
-              <div style={{
-                fontSize: '0.8rem',
-                color: '#6b7280',
-                marginTop: '4px'
-              }}>
-                💡 Required for UPI payments. Must contain @ symbol (e.g., name@paytm)
-              </div>
-            </div>
+            
 
             <div>
               <label style={{ 
