@@ -1,1 +1,1 @@
-export const BACKEND_URL ="https://backend-8d9y.onrender.com"; // Replace with your actual backend URL
+export const BACKEND_URL ="http://192.168.56.1:5000"; // Replace with your actual backend URL
