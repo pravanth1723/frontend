@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Snackbar from "../components/Snackbar";
+import PaymentMethods from "../components/PaymentMethods";
 import { BACKEND_URL } from "../config";
 
 import "./Dashboard.css";
@@ -112,6 +113,9 @@ const Dashboard = () => {
 
   return (
     <div className="room-container">
+      {/* Payment Methods Section */}
+      <PaymentMethods />
+
       <div className="dashboard-header">
         <div>
           <h2 className="dashboard-title">Income Dashboard</h2>
