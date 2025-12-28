@@ -20,7 +20,7 @@ export default function PaymentMethods() {
 
   const [snackbar, setSnackbar] = useState(null);
 
-  const paymentTypes = ["CreditCard", "DebitCard", "Paylater", "Bank"];
+  const paymentTypes = ["CreditCard", "DebitCard", "Paylater", "Bank", "Cash", "Others"];
 
   const fetchMethods = async () => {
     setIsLoading(true);
@@ -97,6 +97,8 @@ export default function PaymentMethods() {
       case "DebitCard": return "🏦";
       case "Paylater": return "⏳";
       case "Bank": return "🏛️";
+      case "Cash": return "💵";
+      case "Others": return "🛠️";
       default: return "💰";
     }
   };
@@ -106,7 +108,9 @@ export default function PaymentMethods() {
       case "CreditCard": return "Credit Card";
       case "DebitCard": return "Debit Card";
       case "Paylater": return "Pay Later";
-      case "Bank": return "Bank Transfer";
+      case "Bank": return "UPI/Bank Account";
+      case "Cash": return "Cash";
+      case "Others": return "Others";
       default: return type;
     }
   };
@@ -116,7 +120,7 @@ export default function PaymentMethods() {
       <div className="payment-methods-header">
         <h3 className="payment-methods-title">
           <span className="payment-methods-icon">💳</span>
-          Payment Methods
+          Your Payment Instruments
         </h3>
       </div>
 
@@ -125,12 +129,12 @@ export default function PaymentMethods() {
           <div className="add-method-card">
             <h4 className="add-method-title">
               <span className="add-method-icon">➕</span>
-              Add New Payment Method
+              Add New Payment Instrument
             </h4>
 
             <div className="form-container">
               <div className="form-group">
-                <label className="form-label">Payment Method Name *</label>
+                <label className="form-label">Payment Instrument Name *</label>
                 <input
                   type="text"
                   value={text}
@@ -171,7 +175,7 @@ export default function PaymentMethods() {
           <div className="methods-list-card">
             <h4 className="methods-list-title">
               <span className="methods-list-icon">📋</span>
-              Your Payment Methods ({methods.length})
+              Your Payment Instruments ({methods.length})
             </h4>
 
             <div className="methods-list-content">
