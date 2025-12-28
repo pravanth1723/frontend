@@ -19,8 +19,6 @@ export default function PaymentMethods() {
   const [type, setType] = useState("");
 
   const [snackbar, setSnackbar] = useState(null);
-  const [editingMethod, setEditingMethod] = useState(null);
-  const [isMethodsOpen, setIsMethodsOpen] = useState(false);
 
   const paymentTypes = ["CreditCard", "DebitCard", "Paylater", "Bank"];
 
@@ -55,7 +53,7 @@ export default function PaymentMethods() {
     }
 
     const methodData = {
-      text: text.trim(),
+      name: text.trim(),
       type: type
     };
 
@@ -89,34 +87,6 @@ export default function PaymentMethods() {
     } catch (error) {
       console.error("Error deleting payment method:", error);
       const errorMsg = error.response?.data?.message || 'Failed to delete payment method';
-      setSnackbar({ category: 'error', message: errorMsg });
-    }
-  }
-
-  async function applyEdit() {
-    if (!editingMethod.text.trim()) {
-      setSnackbar({ category: 'error', message: 'Payment method name is required' });
-      return;
-    }
-    if (!editingMethod.type) {
-      setSnackbar({ category: 'error', message: 'Please select a payment type' });
-      return;
-    }
-
-    try {
-      const response = await axios.put(
-        `${BACKEND_URL}/api/users/methods/${editingMethod._id}`,
-        { text: editingMethod.text.trim(), type: editingMethod.type },
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
-        setSnackbar({ category: 'success', message: 'Payment method updated successfully!' });
-        setEditingMethod(null);
-        fetchMethods();
-      }
-    } catch (error) {
-      console.error("Error updating payment method:", error);
-      const errorMsg = error.response?.data?.message || 'Failed to update payment method';
       setSnackbar({ category: 'error', message: errorMsg });
     }
   }
@@ -231,16 +201,10 @@ export default function PaymentMethods() {
                         </div>
                         <div className="method-actions">
                           <button
-                            onClick={() => setEditingMethod({ ...method })}
-                            className="edit-method-btn"
-                          >
-                            ✏️ Edit
-                          </button>
-                          <button
                             onClick={() => handleDeleteMethod(method._id)}
                             className="delete-method-btn"
                           >
-                            🗑️ Delete
+                            🗑️
                           </button>
                         </div>
                       </div>
@@ -252,61 +216,6 @@ export default function PaymentMethods() {
           </div>
         </div>
       </div>
-
-      {/* Edit Modal */}
-      {editingMethod && (
-        <div className="modal-backdrop" onClick={(e) => {
-          if (e.target.classList.contains('modal-backdrop')) {
-            setEditingMethod(null);
-          }
-        }}>
-          <div className="modal">
-            <h3 className="modal-title">Edit Payment Method</h3>
-            
-            <div className="form-group">
-              <label className="form-label">Payment Method Name *</label>
-              <input
-                type="text"
-                value={editingMethod.text}
-                onChange={(e) => setEditingMethod({ ...editingMethod, text: e.target.value })}
-                placeholder="e.g., HDFC Credit Card"
-                className="form-input"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Type *</label>
-              <select
-                value={editingMethod.type}
-                onChange={(e) => setEditingMethod({ ...editingMethod, type: e.target.value })}
-                className="form-select"
-              >
-                <option value="">Select payment type</option>
-                {paymentTypes.map(pt => (
-                  <option key={pt} value={pt}>
-                    {getTypeIcon(pt)} {getTypeLabel(pt)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="modal-actions">
-              <button
-                onClick={() => setEditingMethod(null)}
-                className="btn-cancel"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={applyEdit}
-                className="btn-apply"
-              >
-                Apply
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {snackbar && (
         <Snackbar

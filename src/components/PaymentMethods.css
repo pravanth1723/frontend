@@ -251,28 +251,13 @@
     gap: 8px;
 }
 
-.edit-method-btn,
 .delete-method-btn {
-    padding: 8px 16px;
+    padding: 8px 12px;
     border: none;
     border-radius: 6px;
-    font-size: 0.9rem;
+    font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.2s;
-    font-weight: 500;
-}
-
-.edit-method-btn {
-    background: #eff6ff;
-    color: #1e40af;
-}
-
-.edit-method-btn:hover {
-    background: #dbeafe;
-    transform: translateY(-1px);
-}
-
-.delete-method-btn {
     background: #fef2f2;
     color: #991b1b;
 }

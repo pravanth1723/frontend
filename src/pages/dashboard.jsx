@@ -197,8 +197,8 @@ const Dashboard = () => {
                     </div>
                     <div className="expense-right">{Number(inc.amount).toFixed(2)}</div>
                     <div className="expense-actions">
-                      <button type="button" className="edit-expense-btn" onClick={(e) => { e.preventDefault(); setEditingIncome({ ...inc }); }}>Edit</button>
-                      <button type="button" className="delete-expense-btn" onClick={(e) => { e.preventDefault(); handleDeleteIncome(inc); }}>Delete</button>
+                      <button type="button" className="edit-expense-btn" onClick={(e) => { e.preventDefault(); setEditingIncome({ ...inc }); }}>✏️</button>
+                      <button type="button" className="delete-expense-btn" onClick={(e) => { e.preventDefault(); handleDeleteIncome(inc); }}>🗑️</button>
                     </div>
                   </li>
                 ))}
