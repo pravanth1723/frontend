@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import CreateRoom from "../components/Rooms/CreateRoom";
 import RoomsList from "../components/Rooms/RoomsList";
 import JoinRoomComponent from "../components/Rooms/JoinRoom";
@@ -14,6 +15,7 @@ import { BACKEND_URL } from "../config";
 export default function RoomsPage() {
   const [apiRooms, setApiRooms] = useState([]);
   const [snackbar, setSnackbar] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchRooms();
@@ -49,6 +51,11 @@ export default function RoomsPage() {
         </div>
 
         <div className="col">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <h3 style={{ margin: 0 }}>My Rooms</h3>
+            <button className="back-button" onClick={() => navigate('/dashboard')}>Go to Dashboard</button>
+          </div>
+
           <RoomsList rooms={apiRooms} onRoomsChange={fetchRooms} />
         </div>
       </div>
