@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import CreateRoom from "../components/Rooms/CreateRoom";
@@ -7,21 +7,12 @@ import JoinRoomComponent from "../components/Rooms/JoinRoom";
 import Snackbar from "../components/Snackbar";
 import { BACKEND_URL } from "../config";
 
-/**
- * RoomsPage
- * - Main page for managing rooms
- * - Displays create room, join room, and list of rooms
- */
 export default function RoomsPage() {
   const [apiRooms, setApiRooms] = useState([]);
   const [snackbar, setSnackbar] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchRooms();
-  }, []);
-
-  function fetchRooms() {
+  const fetchRooms = useCallback(() => {
     axios
       .get(`${BACKEND_URL}/api/rooms`, { withCredentials: true })
       .then(response => {
@@ -35,13 +26,11 @@ export default function RoomsPage() {
       .catch(error => {
         console.error("Error fetching rooms:", error);
 
-        // 🔐 Unauthorized → redirect to login
         if (error.response?.status === 401) {
           navigate("/login", { replace: true });
           return;
         }
 
-        // Other errors → show snackbar
         setSnackbar({
           category: "error",
           message: "Failed to fetch rooms. Please try again."
@@ -49,7 +38,11 @@ export default function RoomsPage() {
 
         setApiRooms([]);
       });
-  }
+  }, [navigate]);
+
+  useEffect(() => {
+    fetchRooms();
+  }, [fetchRooms]);
 
   return (
     <div className="container-card">

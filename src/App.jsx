@@ -10,7 +10,6 @@ import RoomPage from "./pages/Room";
 import RoomsPage from "./pages/Rooms";
 import Dashboard from "./pages/dashboard";
 import Spinner from "./components/Spinner";
-import UserAnalytics from "./components/UserAnalytics";
 
 import { BACKEND_URL } from "./config";
 
