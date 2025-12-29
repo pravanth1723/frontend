@@ -199,7 +199,7 @@ export default function PaymentMethods() {
                           <div>
                             <h5 className="method-name">{method.text}</h5>
                             <div className="method-type-label">
-                              {getTypeLabel(method.type)}
+                              {getTypeLabel(method.name)}
                             </div>
                           </div>
                         </div>

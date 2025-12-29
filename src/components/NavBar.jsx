@@ -13,8 +13,8 @@ export default function NavBar() {
   async function logout() {
     try {
       // Call backend logout endpoint to clear session
-      await axios.post(`${BACKEND_URL}/api/users/logout`, {}, { 
-        withCredentials: true 
+      await axios.post(`${BACKEND_URL}/api/users/logout`, {}, {
+        withCredentials: true
       });
     } catch (error) {
       console.error("Logout error:", error);
@@ -39,14 +39,20 @@ export default function NavBar() {
       <div className="nav-right">
         {user === "loggedin" ? (
           <>
-            <Link 
-              to="/rooms" 
+            <Link
+              to="/rooms"
               className={`nav-item nav-link ${location.pathname.includes('/room') ? 'active' : ''}`}
             >
               My Rooms
             </Link>
-            <button 
-              className="nav-item nav-button" 
+            <Link
+              to="/dashboard"
+              className={`nav-item nav-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
+            >
+              Dashboard
+            </Link>
+            <button
+              className="nav-item nav-button"
               onClick={logout}
             >
               Logout
@@ -54,14 +60,14 @@ export default function NavBar() {
           </>
         ) : (
           <>
-            <Link 
-              to="/login" 
+            <Link
+              to="/login"
               className={`nav-item nav-link ${isLoginPage ? 'active' : ''}`}
             >
               Login
             </Link>
-            <Link 
-              to="/register" 
+            <Link
+              to="/register"
               className={`nav-item nav-button ${isRegisterPage ? 'active' : ''}`}
             >
               Register
