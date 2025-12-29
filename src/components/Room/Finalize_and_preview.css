@@ -695,3 +695,26 @@
     white-space: normal;
   }
 }
+
+.settlement-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.settlement-table th {
+  text-align: left;
+  padding: 10px;
+  background: #f3f4f6;
+  font-weight: 700;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.settlement-table td {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.settlement-table tr:hover {
+  background-color: #f9fafb;
+}
