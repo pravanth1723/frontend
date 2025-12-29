@@ -8,6 +8,7 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 import RoomPage from "./pages/Room";
 import RoomsPage from "./pages/Rooms";
+import Dashboard from "./pages/dashboard";
 import Spinner from "./components/Spinner";
 import { BACKEND_URL } from "./config";
 
@@ -88,6 +89,15 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <RoomPage />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
                 </ProtectedRoute>
               } 
             />

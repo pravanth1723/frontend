@@ -1,0 +1,388 @@
+.payment-methods-container {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+/* Header section */
+.payment-methods-header {
+    background: linear-gradient(135deg, #6ee7b7 0%, #3b82f6 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.18);
+}
+
+.payment-methods-title {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.payment-methods-icon {
+    font-size: 1.75rem;
+}
+
+/* Grid layout */
+.payment-methods-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.payment-methods-left,
+.payment-methods-right {
+    min-width: 0;
+}
+
+/* Add method card */
+.add-method-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    height: 100%;
+}
+
+.add-method-title {
+    font-size: 1.25rem;
+    margin: 0 0 20px 0;
+    font-weight: 600;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-method-icon {
+    font-size: 1.5rem;
+}
+
+/* Form container */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.95rem;
+}
+
+.form-input,
+.form-select {
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    background: white;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-select {
+    cursor: pointer;
+}
+
+.submit-method-btn {
+    padding: 14px 24px;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+}
+
+.submit-method-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.submit-method-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Methods list card */
+.methods-list-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.methods-list-title {
+    font-size: 1.25rem;
+    margin: 0 0 20px 0;
+    font-weight: 600;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.methods-list-icon {
+    font-size: 1.5rem;
+}
+
+.methods-list-content {
+    flex: 1;
+    min-height: 0;
+}
+
+.methods-scroll {
+    max-height: 450px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.methods-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.methods-scroll::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 4px;
+}
+
+.methods-scroll::-webkit-scrollbar-thumb {
+    background: #9ca3af;
+    border-radius: 4px;
+}
+
+.methods-scroll::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+}
+
+.loading-methods,
+.no-methods {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+/* Methods list */
+.method-item {
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+}
+
+.method-item:last-child {
+    margin-bottom: 0;
+}
+
+.method-item:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.method-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.method-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.method-icon-type {
+    font-size: 2rem;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.method-name {
+    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.method-type-label {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.method-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.delete-method-btn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.delete-method-btn:hover {
+    background: #fee2e2;
+    transform: translateY(-1px);
+}
+
+/* Modal */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+}
+
+.modal {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-title {
+    margin: 0 0 20px 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-cancel,
+.btn-apply {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-cancel {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-cancel:hover {
+    background: #e5e7eb;
+}
+
+.btn-apply {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-apply:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+@media (max-width: 900px) {
+    .payment-methods-container {
+        padding: 0 12px;
+    }
+
+    .payment-methods-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-methods-header,
+    .add-method-card,
+    .methods-list-card {
+        border-radius: 8px;
+    }
+
+    .payment-methods-title {
+        font-size: 1.25rem;
+    }
+
+    .add-method-title,
+    .methods-list-title {
+        font-size: 1.1rem;
+    }
+
+    .method-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .method-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .methods-scroll {
+        max-height: 300px;
+    }
+}

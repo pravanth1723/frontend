@@ -49,6 +49,8 @@ export default function RoomsPage() {
         </div>
 
         <div className="col">
+          <h3 style={{ marginBottom: 12 }}>My Rooms</h3>
+
           <RoomsList rooms={apiRooms} onRoomsChange={fetchRooms} />
         </div>
       </div>

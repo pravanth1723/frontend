@@ -21,15 +21,15 @@ export default function Setup() {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [organizer, setOrganizer] = useState("");
   const [notes, setNotes] = useState("");
-  
-  
+
+
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState("");
   const [editmembers, setEditmembers] = useState("");
   const [editPaymentMethods, setEditPaymentMethods] = useState("");
   const [editOrganizer, setEditOrganizer] = useState("");
   const [editNotes, setEditNotes] = useState("");
-  
+
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -183,8 +183,8 @@ export default function Setup() {
 
   if (isLoading) {
     return (
-      <div style={{ 
-        textAlign: 'center', 
+      <div style={{
+        textAlign: 'center',
         padding: '60px 20px',
         display: 'flex',
         flexDirection: 'column',
@@ -207,8 +207,8 @@ export default function Setup() {
         marginBottom: '24px',
         boxShadow: '0 8px 20px rgba(102, 126, 234, 0.3)'
       }}>
-        <h2 style={{ 
-          fontSize: '1.75rem', 
+        <h2 style={{
+          fontSize: '1.75rem',
           marginBottom: '8px',
           fontWeight: '700',
           display: 'flex',
@@ -228,16 +228,16 @@ export default function Setup() {
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
         border: '1px solid #e5e7eb'
       }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
           marginBottom: '24px',
           paddingBottom: '16px',
           borderBottom: '2px solid #f3f4f6'
         }}>
-          <h3 style={{ 
-            fontSize: '1.5rem', 
+          <h3 style={{
+            fontSize: '1.5rem',
             color: '#1f2937',
             fontWeight: '700',
             display: 'flex',
@@ -248,7 +248,7 @@ export default function Setup() {
             Room Setup
           </h3>
           {!isEditing && (
-            <button 
+            <button
               onClick={handleEdit}
               style={{
                 backgroundColor: '#667eea',
@@ -283,9 +283,9 @@ export default function Setup() {
               borderRadius: '10px',
               border: '1px solid #e5e7eb'
             }}>
-              <div style={{ 
-                fontSize: '0.85rem', 
-                color: '#6b7280', 
+              <div style={{
+                fontSize: '0.85rem',
+                color: '#6b7280',
                 marginBottom: '6px',
                 fontWeight: '600',
                 textTransform: 'uppercase',
@@ -304,9 +304,9 @@ export default function Setup() {
               borderRadius: '10px',
               border: '1px solid #e5e7eb'
             }}>
-              <div style={{ 
-                fontSize: '0.85rem', 
-                color: '#6b7280', 
+              <div style={{
+                fontSize: '0.85rem',
+                color: '#6b7280',
                 marginBottom: '6px',
                 fontWeight: '600',
                 textTransform: 'uppercase',
@@ -327,7 +327,7 @@ export default function Setup() {
                           fontSize: '0.95rem',
                           fontWeight: '500'
                         }}>
-                          💳 {method}
+                          {method}
                         </span>
                       ))}
                     </div>
@@ -363,9 +363,9 @@ export default function Setup() {
               borderRadius: '10px',
               border: '1px solid #e5e7eb'
             }}>
-              <div style={{ 
-                fontSize: '0.85rem', 
-                color: '#6b7280', 
+              <div style={{
+                fontSize: '0.85rem',
+                color: '#6b7280',
                 marginBottom: '6px',
                 fontWeight: '600',
                 textTransform: 'uppercase',
@@ -392,7 +392,7 @@ export default function Setup() {
               </div>
             </div>
 
-            
+
 
             <div style={{
               padding: '16px',
@@ -400,9 +400,9 @@ export default function Setup() {
               borderRadius: '10px',
               border: '1px solid #e5e7eb'
             }}>
-              <div style={{ 
-                fontSize: '0.85rem', 
-                color: '#6b7280', 
+              <div style={{
+                fontSize: '0.85rem',
+                color: '#6b7280',
                 marginBottom: '6px',
                 fontWeight: '600',
                 textTransform: 'uppercase',
@@ -410,8 +410,8 @@ export default function Setup() {
               }}>
                 Notes
               </div>
-              <div style={{ 
-                fontSize: '1rem', 
+              <div style={{
+                fontSize: '1rem',
                 color: '#1f2937',
                 whiteSpace: 'pre-wrap',
                 lineHeight: '1.6'
@@ -423,9 +423,9 @@ export default function Setup() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '8px', 
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
                 fontWeight: '600',
                 color: '#374151',
                 fontSize: '0.95rem'
@@ -453,9 +453,9 @@ export default function Setup() {
 
             {kind === 'personal' ? (
               <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '8px', 
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
                   fontWeight: '600',
                   color: '#374151',
                   fontSize: '0.95rem'
@@ -464,7 +464,7 @@ export default function Setup() {
                 </label>
                 <textarea
                   value={editPaymentMethods}
-                  onChange={(e) => setEditPaymentMethods(e.target.value)}
+                  readOnly={true}
                   placeholder="Enter payment methods (one per line)"
                   rows={4}
                   style={{
@@ -476,17 +476,21 @@ export default function Setup() {
                     fontFamily: 'inherit',
                     resize: 'vertical',
                     transition: 'border-color 0.3s',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    backgroundColor: '#f9fafb',
+                    cursor: 'not-allowed',
+                    opacity: 0.7
                   }}
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                 />
+                <div style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '8px' }}>
+                  Payment methods cannot be edited for personal rooms.
+                </div>
               </div>
             ) : (
               <div>
-                <label style={{ 
-                  display: 'block', 
-                  marginBottom: '8px', 
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
                   fontWeight: '600',
                   color: '#374151',
                   fontSize: '0.95rem'
@@ -516,9 +520,9 @@ export default function Setup() {
             )}
 
             <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '12px', 
+              <label style={{
+                display: 'block',
+                marginBottom: '12px',
                 fontWeight: '600',
                 color: '#374151',
                 fontSize: '0.95rem'
@@ -535,8 +539,8 @@ export default function Setup() {
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {editmembers.split("\n").map(p => p.trim()).filter(p => p).map((person, idx) => (
-                    <label key={idx} style={{ 
-                      display: 'flex', 
+                    <label key={idx} style={{
+                      display: 'flex',
                       alignItems: 'center',
                       padding: '12px',
                       backgroundColor: editOrganizer === person ? '#ede9fe' : '#f9fafb',
@@ -545,16 +549,16 @@ export default function Setup() {
                       border: `2px solid ${editOrganizer === person ? '#a78bfa' : '#e5e7eb'}`,
                       transition: 'all 0.3s'
                     }}
-                    onMouseEnter={(e) => {
-                      if (editOrganizer !== person) {
-                        e.currentTarget.style.backgroundColor = '#f3f4f6';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (editOrganizer !== person) {
-                        e.currentTarget.style.backgroundColor = '#f9fafb';
-                      }
-                    }}>
+                      onMouseEnter={(e) => {
+                        if (editOrganizer !== person) {
+                          e.currentTarget.style.backgroundColor = '#f3f4f6';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (editOrganizer !== person) {
+                          e.currentTarget.style.backgroundColor = '#f9fafb';
+                        }
+                      }}>
                       <input
                         type="radio"
                         name="organizer"
@@ -563,7 +567,7 @@ export default function Setup() {
                         onChange={(e) => setEditOrganizer(e.target.value)}
                         style={{ marginRight: '10px', cursor: 'pointer' }}
                       />
-                      <span style={{ 
+                      <span style={{
                         fontWeight: editOrganizer === person ? '600' : '500',
                         color: editOrganizer === person ? '#6b21a8' : '#374151'
                       }}>
@@ -575,12 +579,12 @@ export default function Setup() {
               )}
             </div>
 
-            
+
 
             <div>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '8px', 
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
                 fontWeight: '600',
                 color: '#374151',
                 fontSize: '0.95rem'
