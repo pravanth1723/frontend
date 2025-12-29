@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import CreateRoom from "../components/Rooms/CreateRoom";
 import RoomsList from "../components/Rooms/RoomsList";
 import JoinRoomComponent from "../components/Rooms/JoinRoom";
@@ -14,23 +15,38 @@ import { BACKEND_URL } from "../config";
 export default function RoomsPage() {
   const [apiRooms, setApiRooms] = useState([]);
   const [snackbar, setSnackbar] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchRooms();
   }, []);
 
   function fetchRooms() {
-    axios.get(`${BACKEND_URL}/api/rooms`, { withCredentials: true })
+    axios
+      .get(`${BACKEND_URL}/api/rooms`, { withCredentials: true })
       .then(response => {
         if (response.status === 200) {
-          console.log('Rooms fetched from API:', response.data);
-          const rooms = Array.isArray(response.data.data) ? response.data.data : [];
+          const rooms = Array.isArray(response.data.data)
+            ? response.data.data
+            : [];
           setApiRooms(rooms);
         }
       })
       .catch(error => {
-        console.error('Error fetching rooms:', error);
-        setSnackbar({ category: 'error', message: 'Failed to fetch rooms. Please try again.' });
+        console.error("Error fetching rooms:", error);
+
+        // 🔐 Unauthorized → redirect to login
+        if (error.response?.status === 401) {
+          navigate("/login", { replace: true });
+          return;
+        }
+
+        // Other errors → show snackbar
+        setSnackbar({
+          category: "error",
+          message: "Failed to fetch rooms. Please try again."
+        });
+
         setApiRooms([]);
       });
   }
@@ -42,7 +58,7 @@ export default function RoomsPage() {
       <div className="row">
         <div className="col">
           <CreateRoom onRoomCreated={fetchRooms} />
-          
+
           <div style={{ marginTop: 20 }}>
             <JoinRoomComponent />
           </div>
@@ -50,7 +66,6 @@ export default function RoomsPage() {
 
         <div className="col">
           <h3 style={{ marginBottom: 12 }}>My Rooms</h3>
-
           <RoomsList rooms={apiRooms} onRoomsChange={fetchRooms} />
         </div>
       </div>
