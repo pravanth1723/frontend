@@ -7,7 +7,7 @@ import { BACKEND_URL } from "../../config";
 import "./Finalize_and_preview.css";
 import { SETTLEMENT_MODES } from "./Settlement/settlementModes";
 import { netSettlement } from "./Settlement/netSettlement";
-import { phonePeSettlement } from "./Settlement/phonePeSettlement";
+import { peerToPeerSettlement } from "./Settlement/peerToPeerSettlement";
 import { organizerSettlement } from "./Settlement/organizerSettlement";
 import SettlementToggle from "./Settlement/SettlementToggle";
 import SettlementTable from "./Settlement/SettlementTable";
@@ -210,8 +210,8 @@ export default function PreviewStep() {
 
   if (settlementMode === SETTLEMENT_MODES.NET) {
     settlements = netSettlement(finalBalance);
-  } else if (settlementMode === SETTLEMENT_MODES.PHONEPE) {
-    settlements = phonePeSettlement(expenses);
+  } else if (settlementMode === SETTLEMENT_MODES.P2P) {
+    settlements = peerToPeerSettlement(expenses);
   } else if (settlementMode === SETTLEMENT_MODES.ORGANIZER) {
     settlements = organizerSettlement(finalBalance, organizer);
   }
@@ -507,7 +507,7 @@ export default function PreviewStep() {
             <span style={{ fontSize: "1.2rem" }}>💡</span>
             <span>
               <b>Net</b>: Fewest transactions (recommended)<br />
-              <b>PhonePe</b>: Standard UPI-style peer payments<br />
+              <b>Peer to Peer</b>: Standard UPI-style peer payments<br />
               <b>Organizer</b>: Everyone settles with organizer
             </span>
           </div>
