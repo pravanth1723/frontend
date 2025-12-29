@@ -10,6 +10,8 @@ import RoomPage from "./pages/Room";
 import RoomsPage from "./pages/Rooms";
 import Dashboard from "./pages/dashboard";
 import Spinner from "./components/Spinner";
+import UserAnalytics from "./components/UserAnalytics";
+
 import { BACKEND_URL } from "./config";
 
 /**
@@ -28,10 +30,10 @@ export default function App() {
 
   async function checkAuthStatus() {
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/users/me`, { 
-        withCredentials: true 
+      const response = await axios.get(`${BACKEND_URL}/api/users/me`, {
+        withCredentials: true
       });
-      
+
       if (response.status === 200 && response.data.data) {
         // User is authenticated
         setUser("loggedin");
@@ -49,10 +51,10 @@ export default function App() {
   // Show loading spinner while checking authentication
   if (isCheckingAuth) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         height: '100vh',
         flexDirection: 'column',
         gap: '16px'
@@ -75,32 +77,33 @@ export default function App() {
             <Route path="/" element={<Home />} />
 
             {/* Protected Routes - require authentication */}
-            <Route 
-              path="/rooms" 
+            <Route
+              path="/rooms"
               element={
                 <ProtectedRoute>
                   <RoomsPage />
                 </ProtectedRoute>
-              } 
+              }
             />
 
-            <Route 
-              path="/room/:roomId/*" 
+            <Route
+              path="/room/:roomId/*"
               element={
                 <ProtectedRoute>
                   <RoomPage />
                 </ProtectedRoute>
-              } 
+              }
             />
 
-            <Route 
-              path="/dashboard" 
+            <Route
+              path="/dashboard/*"
               element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
+
 
             <Route path="*" element={<Navigate to="/rooms" replace />} />
           </Routes>

@@ -32,7 +32,7 @@ export default function NavBar() {
     <nav className="navbar">
       <div className="nav-left">
         <Link to="/" className="nav-brand">
-          💰 SplitWise
+          MyMoneyBuddy
         </Link>
       </div>
 

@@ -1,0 +1,150 @@
+.analytics-container {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+/* Header */
+.analytics-header {
+    background: linear-gradient(135deg, #6ee7b7 0%, #3b82f6 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.18);
+}
+
+.analytics-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+
+.analytics-icon {
+    font-size: 1.75rem;
+}
+
+/* Summary */
+.analytics-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.analytics-summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.analytics-summary-card h4 {
+    margin: 0 0 12px 0;
+    font-size: 1.1rem;
+    color: #374151;
+}
+
+.analytics-summary-card p {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.analytics-summary-card.income p {
+    color: #2a9d8f;
+}
+
+.analytics-summary-card.spent p {
+    color: #e63946;
+}
+
+/* Table card */
+.analytics-table-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.analytics-section-title {
+    margin: 0 0 16px 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.analytics-table-wrapper {
+    overflow-x: auto;
+}
+
+.analytics-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.analytics-table th,
+.analytics-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.analytics-table th {
+    background: #f9fafb;
+    font-weight: 600;
+}
+
+.analytics-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+    .analytics-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.analytics-filter-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 180px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: #374151;
+}
+
+.room-link {
+    color: #3b82f6;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.room-link:hover {
+    text-decoration: underline;
+}
